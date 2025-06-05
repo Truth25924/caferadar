@@ -1,7 +1,38 @@
-<h2>Admin Dashboard</h2>
-<ul>
-  {% for user in users %}
-    <li>{{ user.username }} - {{ user.role }}</li>
-  {% endfor %}
-</ul>
-<a href="/profile">Profile</a> | <a href="/logout">Logout</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - Cafe Radar</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+</head>
+<body>
+  <header>
+    <h1>Cafe Radar - Admin</h1>
+    <nav class="nav-links">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/admin/users">Users</a>
+      <a href="/profile">Profile</a>
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+
+  <h2>Cafe Recommendations</h2>
+  <div class="card-container">
+    <div class="cafe-card">
+      <h3>Bean Haven</h3>
+      <p>Cozy nook with top-tier espresso and comfy seating.</p>
+      <button class="edit-btn">Edit</button>
+    </div>
+    <div class="cafe-card">
+      <h3>Latte Lounge</h3>
+      <p>Modern cafe with latte art and delicious brunch options.</p>
+      <button class="edit-btn">Edit</button>
+    </div>
+    <div class="cafe-card">
+      <h3>Brew & Chill</h3>
+      <p>Great spot for late-night studying and strong brews.</p>
+      <button class="edit-btn">Edit</button>
+    </div>
+  </div>
+</body>
+</html>

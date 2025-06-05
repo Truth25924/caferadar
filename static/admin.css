@@ -1,0 +1,74 @@
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: #f9f9f9;
+}
+
+header {
+  background-color: #4b2e2e;
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  margin-left: 20px;
+  font-weight: bold;
+}
+
+h2 {
+  padding: 20px;
+  margin: 0;
+}
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 0 20px 20px;
+  justify-content: center;
+}
+
+.cafe-card {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  width: 300px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cafe-card h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.cafe-card p {
+  color: #666;
+  flex-grow: 1;
+}
+
+.edit-btn {
+  background-color: #4b2e2e;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.edit-btn:hover {
+  background-color: #362020;
+}

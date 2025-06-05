@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Management - Cafe Radar</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <style>
+    .user-list {
+      padding: 20px;
+    }
+
+    .user-item {
+      background-color: white;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .user-info {
+      font-size: 16px;
+    }
+
+    .user-actions button {
+      margin-left: 10px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .edit-btn {
+      background-color: #3c7b3c;
+    }
+
+    .delete-btn {
+      background-color: #c0392b;
+    }
+
+    .edit-btn:hover {
+      background-color: #2e5d2e;
+    }
+
+    .delete-btn:hover {
+      background-color: #992d22;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Cafe Radar - Admin</h1>
+    <nav class="nav-links">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/admin/users">Users</a>
+      <a href="/profile">Profile</a>
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+
+  <h2>Manage Users</h2>
+  <div class="user-list">
+    {% for user in users %}
+      <div class="user-item">
+        <div class="user-info">{{ user.username }} - {{ user.role }}</div>
+        <div class="user-actions">
+          <button class="edit-btn">Edit</button>
+          <button class="delete-btn">Delete</button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</body>
+</html>

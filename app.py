@@ -59,6 +59,14 @@ def profile():
         return redirect('/login')
     return render_template('profile.html', username=session['username'], role=session['role'])
 
+@app.route('/admin/users')
+def admin_users():
+    if 'username' not in session or session['role'] != 'admin':
+        return redirect('/login')
+
+    all_users = users_col.find({}, {'_id': 0, 'username': 1, 'role': 1})
+    return render_template('admin_users.html', users=all_users)
+
 
 @app.route('/logout')
 def logout():
