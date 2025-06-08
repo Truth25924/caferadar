@@ -17,6 +17,10 @@
       <input type="url" name="maps_url" value="{{ cafe.maps_url }}" required />
     </label>
     <label>
+      Address:
+      <input type="text" name="address" value="{{ cafe.address or '' }}" placeholder="Cafe address..." required />
+    </label>
+    <label>
       Current Picture:<br>
       {% if cafe.image_url %}
         <img src="{{ cafe.image_url }}" alt="Cafe Image" style="max-width:180px;max-height:120px;border-radius:8px;margin:0.5rem 0;">

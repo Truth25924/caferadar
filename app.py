@@ -6,6 +6,7 @@ from functools import wraps
 from bson.objectid import ObjectId
 import os
 from datetime import datetime
+from flask_login import current_user, login_required
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  
@@ -68,7 +69,6 @@ def register():
         email = request.form['email']
         gender = request.form['gender']
         birthday = request.form['birthday']
-        sex = request.form['sex']
         contactnumber = request.form.get('contactnumber', None)  # Optional
 
         if users_col.find_one({'username': username}):
@@ -91,7 +91,6 @@ def register():
             'email': email,
             'gender': gender,
             'birthday': birthday,
-            'sex': sex,
             'role': role
         }
         if contactnumber:
@@ -140,7 +139,6 @@ def serialize_cafe(cafe):
     cafe = dict(cafe)
     if '_id' in cafe and isinstance(cafe['_id'], ObjectId):
         cafe['_id'] = str(cafe['_id'])
-    # Normalize ratings
     normalized_ratings = []
     for r in cafe.get('ratings', []):
         if isinstance(r, dict):
@@ -148,7 +146,6 @@ def serialize_cafe(cafe):
         else:
             normalized_ratings.append({'user': 'Unknown', 'rating': r, 'timestamp': None})
     cafe['ratings'] = normalized_ratings
-    # Normalize comments
     normalized_comments = []
     for c in cafe.get('comments', []):
         if isinstance(c, dict):
@@ -156,6 +153,9 @@ def serialize_cafe(cafe):
         else:
             normalized_comments.append({'user': 'Unknown', 'comment': c, 'timestamp': None})
     cafe['comments'] = normalized_comments
+    # Ensure address key exists
+    if 'address' not in cafe:
+        cafe['address'] = ''
     return cafe
     
 @app.route('/edit_profile', methods=['POST'])
@@ -173,7 +173,6 @@ def edit_profile():
     email = request.form.get('email')
     gender = request.form.get('gender')
     birthday = request.form.get('birthday')
-    sex = request.form.get('sex')
     contactnumber = request.form.get('contactnumber')
 
     # Handle profile picture upload
@@ -192,7 +191,6 @@ def edit_profile():
         'email': email,
         'gender': gender,
         'birthday': birthday,
-        'sex': sex,
         'contactnumber': contactnumber,
         'profile_pic_url': profile_pic_url
     }
@@ -255,6 +253,8 @@ def add_cafe():
     name = request.form['name']
     description = request.form['description']
     maps_url = request.form['maps_url']
+    address = request.form.get('address', '').strip()  
+
 
     # FOR handling image upload!!!
     image = request.files.get('image')
@@ -274,6 +274,7 @@ def add_cafe():
         'name': name,
         'description': description,
         'maps_url': maps_url,
+        'address': address,
         'image_url': image_url,
         'ratings': [],
         'comments': []
@@ -302,6 +303,8 @@ def edit_cafe(cafe_id):
         name = request.form['name']
         description = request.form['description']
         maps_url = request.form['maps_url']
+        address = request.form.get('address', '').strip()  # NEW
+
 
         # Handle image upload
         image = request.files.get('image')
@@ -320,6 +323,7 @@ def edit_cafe(cafe_id):
                 'name': name,
                 'description': description,
                 'maps_url': maps_url,
+                'address': address,
                 'image_url': image_url
             }}
         )
@@ -330,38 +334,92 @@ def edit_cafe(cafe_id):
 
 # ----------- Rate and Comment -----------
 
-# When a user rates a cafe
-@app.route('/cafe/rate/<cafe_id>', methods=['POST'])
+@app.route('/cafe/rate_and_comment/<cafe_id>', methods=['POST'])
 @login_required
-def rate_cafe(cafe_id):
-    rating = int(request.form['rating'])
+def rate_and_comment_cafe(cafe_id):
+    rating = request.form.get('rating')
+    comment = request.form.get('comment')
     user = session['username']
+
+    # Validate both fields are present and not empty
+    if not rating or not comment or not comment.strip():
+        flash('Both rating and comment are required.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    try:
+        rating = int(rating)
+        if rating < 1 or rating > 5:
+            raise ValueError
+    except ValueError:
+        flash('Invalid rating value.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    timestamp = datetime.utcnow().isoformat()
+
     rating_obj = {
         'user': user,
         'rating': rating,
-        'timestamp': datetime.utcnow().isoformat()
+        'timestamp': timestamp
     }
-    cafes_col.update_one({'_id': ObjectId(cafe_id)}, {'$push': {'ratings': rating_obj}})
+    comment_obj = {
+        '_id': str(ObjectId()),
+        'user': user,
+        'comment': comment.strip(),
+        'timestamp': timestamp,
+        'rating': rating  
+    }
+
+    # Just add new rating and comment (do not remove previous ones)
+    cafes_col.update_one(
+    {'_id': ObjectId(cafe_id)},
+    {
+        '$push': {
+            'ratings': rating_obj,
+            'comments': comment_obj
+            }
+        }
+    )
+    flash('Thank you for your feedback!', 'success')
     return redirect(url_for('dashboard'))
 
-# When a user comments on a cafe
-@app.route('/cafe/comment/<cafe_id>', methods=['POST'])
+# DELETE FOR USERS ONLY
+
+@app.route('/delete_comment/<cafe_id>/<comment_id>', methods=['POST'])
 @login_required
-def comment_cafe(cafe_id):
-    comment = request.form['comment']
-    user = session['username']
-    comment_obj = {
-        'user': user,
-        'comment': comment,
-        'timestamp': datetime.utcnow().isoformat()
-    }
-    cafes_col.update_one({'_id': ObjectId(cafe_id)}, {'$push': {'comments': comment_obj}})
+def delete_comment(cafe_id, comment_id):
+    cafe = db.cafes.find_one({'_id': ObjectId(cafe_id)})
+    if not cafe:
+        flash('Cafe not found.', 'danger')
+        return redirect(url_for('dashboard'))
+    # Only match comments that have an _id
+    comment = next((c for c in cafe['comments'] if c.get('_id') and str(c['_id']) == comment_id), None)
+    if not comment or comment['user'] != session['username']:
+        flash('You can only delete your own comment.', 'danger')
+        return redirect(url_for('dashboard'))
+    db.cafes.update_one(
+        {'_id': ObjectId(cafe_id)},
+        {'$pull': {'comments': {'_id': comment_id}}}
+    )
+    flash('Comment deleted.', 'danger')
     return redirect(url_for('dashboard'))
+
+# DELETE FOR ADMIN ONLY
+@app.route('/admin_delete_comment/<cafe_id>/<comment_id>', methods=['POST'])
+def admin_delete_comment(cafe_id, comment_id):
+    # (Optional) Add admin authentication check here!
+    cafe = db.cafes.find_one({'_id': ObjectId(cafe_id)})
+    if not cafe:
+        return jsonify({'success': False, 'msg': 'Cafe not found.'}), 404
+    db.cafes.update_one(
+        {'_id': ObjectId(cafe_id)},
+        {'$pull': {'comments': {'_id': comment_id}}}
+    )
+    return jsonify({'success': True})
 
 def normalize_cafe_ratings_comments(cafes):
     """
     Ensures all ratings are dicts with keys: user, rating, timestamp.
-    Ensures all comments are dicts with keys: user, comment, timestamp.
+    Ensures all comments are dicts with keys: user, comment, timestamp, rating.
     """
     for cafe in cafes:
         # Normalize ratings
@@ -377,9 +435,12 @@ def normalize_cafe_ratings_comments(cafes):
         normalized_comments = []
         for c in cafe.get('comments', []):
             if isinstance(c, dict):
+                # Ensure 'rating' key exists
+                if 'rating' not in c or c['rating'] is None:
+                    c['rating'] = 0
                 normalized_comments.append(c)
             else:
-                normalized_comments.append({'user': 'Unknown', 'comment': c, 'timestamp': None})
+                normalized_comments.append({'user': 'Unknown', 'comment': c, 'timestamp': None, 'rating': 0})
         cafe['comments'] = normalized_comments
     return cafes
 

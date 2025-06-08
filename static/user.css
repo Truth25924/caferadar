@@ -1,13 +1,10 @@
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    scroll-behavior: smooth;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
 }
 
-/* CafeRadar User Dashboard CSS - Grab-inspired */
-
-/* Root variables for easy color management */
 :root {
   --primary: #00b14f;
   --primary-dark: #008f3a;
@@ -22,9 +19,7 @@
   --navbar-height: 64px;
 }
 
-/* Reset and base styles */
 body {
-  margin: 0;
   font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
   background: var(--secondary);
   color: #222;
@@ -58,8 +53,6 @@ body {
   list-style: none;
   display: flex;
   gap: 2rem;
-  margin: 0;
-  padding: 0;
 }
 
 .navbar-links li a {
@@ -79,7 +72,6 @@ body {
   align-items: center;
   gap: 1.2rem;
 }
-
 .navbar-profile {
   display: flex;
   align-items: center;
@@ -89,11 +81,9 @@ body {
   border-radius: 999px;
   transition: background var(--transition);
 }
-
 .navbar-profile:hover {
   background: var(--secondary);
 }
-
 .profile-pic {
   width: 38px;
   height: 38px;
@@ -102,7 +92,6 @@ body {
   border: 2px solid var(--primary);
   background: var(--gray);
 }
-
 .logout-btn {
   color: var(--danger);
   background: none;
@@ -113,7 +102,6 @@ body {
   padding: 0 0.5rem;
   text-decoration: none;
 }
-
 .logout-btn:hover {
   color: #b91c1c;
 }
@@ -133,14 +121,13 @@ section h2 {
   font-weight: 700;
 }
 
-/* Cafe List */
+/* Cafe List & Cards */
 .cafe-list {
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
   margin-bottom: 2.5rem;
 }
-
 .cafe-card {
   background: var(--white);
   border-radius: var(--border-radius);
@@ -197,11 +184,9 @@ section h2 {
   gap: 0.4rem;
   transition: color var(--transition);
 }
-
 .cafe-location:hover {
   color: var(--primary-dark);
 }
-
 .cafe-rating {
   display: flex;
   align-items: center;
@@ -209,86 +194,470 @@ section h2 {
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
 }
-
 .rating-number {
   margin-left: 0.6rem;
   color: var(--gray-dark);
   font-size: 0.98rem;
 }
 
-.rate-form, .comment-form {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.rate-form select, .comment-form input[type="text"] {
-  padding: 0.3rem 0.7rem;
-  border-radius: 6px;
-  border: 1px solid var(--gray);
-  font-size: 1rem;
-}
-
-.rate-form button, .comment-form button {
-  background: var(--primary);
-  color: var(--white);
-  border: none;
-  border-radius: 6px;
-  padding: 0.3rem 1.1rem;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background var(--transition);
-}
-
-.rate-form button:hover, .comment-form button:hover {
-  background: var(--primary-dark);
-}
-
+/* Cafe Card Comment Preview */
 .cafe-comments {
   margin-top: 0.5rem;
   font-size: 0.98rem;
   color: #333;
+  min-height: 3.8em;
+  height: 6em;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: relative;
 }
-
+.cafe-comments .comment-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: #f6fff9;
+  border-radius: 6px;
+  padding: 0.7em 1em;
+  font-size: 1em;
+  line-height: 1.4;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 2.2em;
+}
+.cafe-comments .comment-stars {
+  margin-bottom: 0.3em;
+  display: flex;
+  flex-direction: row;
+  gap: 0.08em;
+}
+.cafe-comments .comment-stars i {
+  color: #ffd700;
+  font-size: 1.08em;
+  vertical-align: middle;
+}
+.cafe-comments .comment-text {
+  color: #008f3a;
+  font-style: italic;
+  font-size: 1em;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 0.2em;
+}
+.cafe-comments .comment-user {
+  color: #888;
+  font-style: normal;
+  font-size: 0.97em;
+  margin-top: 0.1em;
+  font-weight: 500;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+}
 .cafe-comments ul {
   margin: 0.3rem 0 0 1.2rem;
   padding: 0;
   list-style: disc;
 }
-
 .cafe-comments li {
   margin-bottom: 0.2rem;
 }
 
-/* Profile Modal */
-.modal {
+/* Rate & Comment Form */
+.rate-comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7em;
+  background: #f6fff9;
+  border-radius: 8px;
+  padding: 1em 1.2em;
+  margin-top: 0.5em;
+  margin-bottom: 0.7em;
+  box-shadow: 0 1px 4px rgba(0, 177, 79, 0.07);
+  border: 1px solid var(--gray);
+  max-width: 100%;
+}
+.rate-comment-form label {
+  font-weight: 500;
+  color: var(--primary-dark);
+  margin-bottom: 0.2em;
+  font-size: 1.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.rate-comment-form select[name="rating"] {
+  appearance: none;
+  background: #fff;
+  border: 1.5px solid var(--gray);
+  border-radius: 6px;
+  padding: 0.4em 1.2em 0.4em 0.7em;
+  font-size: 1em;
+  color: #222;
+  margin-left: 0.5em;
+  transition: border 0.18s, box-shadow 0.18s;
+  outline: none;
+}
+.rate-comment-form select[name="rating"]:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px #00b14f22;
+}
+.rate-comment-form input[type="text"] {
+  border: 1.5px solid var(--gray);
+  border-radius: 6px;
+  padding: 0.5em 0.9em;
+  font-size: 1em;
+  background: #fff;
+  color: #222;
+  transition: border 0.18s, box-shadow 0.18s;
+  outline: none;
+  margin-top: 0.1em;
+}
+.rate-comment-form input[type="text"]:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px #00b14f22;
+}
+.rate-comment-form button[type="submit"] {
+  margin-top: 0.5em;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6em 1.2em;
+  font-size: 1.08em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+  box-shadow: 0 1px 4px rgba(0, 177, 79, 0.09);
+  letter-spacing: 0.02em;
+}
+.rate-comment-form button[type="submit"]:hover,
+.rate-comment-form button[type="submit"]:focus {
+  background: var(--primary-dark);
+  box-shadow: 0 2px 8px rgba(0, 177, 79, 0.13);
+}
+
+/* Modal Styles */
+.cafe-modal {
   display: none;
   position: fixed;
-  z-index: 1000;
-  left: 0; top: 0; width: 100vw; height: 100vh;
-  overflow: auto;
-  background: rgba(0,0,0,0.25);
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  transition: background 0.2s;
 }
-
-.modal-content {
-  background: var(--white);
-  margin: 5% auto;
-  padding: 2.2rem 2rem 2rem 2rem;
+.cafe-modal-content {
+  background: #fff;
+  margin: 4vh auto;
   border-radius: 16px;
-  width: 95%;
-  max-width: 420px;
+  max-width: 700px;
+  width: 95vw;
+  height: 100vh;
+  max-height: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  animation: zoomIn 0.25s;
   position: relative;
-  box-shadow: 0 8px 32px rgba(0, 177, 79, 0.13);
-  animation: modalIn 0.25s cubic-bezier(.4,2,.6,1);
+  padding: 0;
+}
+@keyframes zoomIn {
+  from { transform: scale(0.85); opacity: 0.5; }
+  to { transform: scale(1); opacity: 1; }
+}
+.cafe-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 28px;
+  font-size: 2.2rem;
+  color: #888;
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.18s;
+}
+.cafe-modal-close:hover {
+  color: #ef4444;
+}
+.cafe-modal-body {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  padding: 2.5rem 2.5rem 2rem 2.5rem;
+}
+.cafe-modal-image img {
+  width: 260px;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #f5f5f5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+.cafe-modal-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.cafe-modal-details h2 {
+  margin: 0 0 0.3rem 0;
+  font-size: 2rem;
+  color: #222;
+}
+.cafe-modal-details .cafe-rating {
+  margin: 0.5rem 0 0.2rem 0;
 }
 
-@keyframes modalIn {
-  from { transform: translateY(-40px) scale(0.97); opacity: 0; }
-  to { transform: translateY(0) scale(1); opacity: 1; }
+/* Modal Comments Section */
+.cafe-modal-details .cafe-comments {
+  background: #f6fff9;
+  border-radius: 10px;
+  padding: 1.1em 1.3em;
+  margin-top: 1.2em;
+  margin-bottom: 1.2em;
+  min-height: 12em;
+  max-height: 45%;
+  height: 100vh;
+  box-shadow: 0 1px 6px rgba(0, 177, 79, 0.07);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.cafe-modal-details .cafe-comments > strong {
+  margin-bottom: 0.7em;
+  color: #008f3a;
+  font-size: 1.08em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  display: block;
+}
+.cafe-modal-details #modalCafeComments {
+  flex: 1 1 auto;
+  min-height: 7em;
+  max-height: 100em;
+  overflow-y: auto;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1em;
+  scrollbar-width: thin;
+  scrollbar-color: #00b14f #e5e7eb;
+}
+.cafe-modal-details #modalCafeComments::-webkit-scrollbar {
+  width: 8px;
+  background: #e5e7eb;
+}
+.cafe-modal-details #modalCafeComments::-webkit-scrollbar-thumb {
+  background: #00b14f;
+  border-radius: 8px;
+}
+.cafe-modal-details #modalCafeComments li {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 177, 79, 0.07);
+  padding: 1em 1.2em 0.9em 1.2em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 100%;
+  min-width: 0;
+}
+.cafe-modal-details #modalCafeComments .comment-stars {
+  margin-bottom: 0.3em;
+  display: flex;
+  flex-direction: row;
+  gap: 0.08em;
+}
+.cafe-modal-details #modalCafeComments .comment-stars i {
+  color: #ffd700;
+  font-size: 1.15em;
+  vertical-align: middle;
+  filter: drop-shadow(0 1px 2px #ffe06655);
+}
+.cafe-modal-details #modalCafeComments .comment-text {
+  color: grey;
+  font-style: italic;
+  font-size: 1em;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 0.2em;
+}
+.cafe-modal-details #modalCafeComments .comment-meta {
+  color: #888;
+  font-style: normal;
+  font-size: 0.97em;
+  margin-top: 0.1em;
+  font-weight: 500;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  display: flex;
+  gap: 0.7em;
+}
+.cafe-modal-details #modalCafeComments .comment-user {
+  font-weight: 600;
+  color: #00b14f;
+}
+.cafe-modal-details #modalCafeComments .comment-date {
+  color: #888;
+  font-size: 0.95em;
+}
+.cafe-modal-details #modalCafeComments:empty::before {
+  content: "No comments yet.";
+  display: block;
+  min-height: 7em;
+  line-height: 7em;
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  font-size: 1.05em;
+  width: 100%;
 }
 
+/* Modal Address & View Maps Styling */
+.cafe-modal-address {
+  margin-top: 0.7em;
+  color: #444;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+  word-break: break-word;
+  max-width: 260px;
+  width: 100%;
+  text-align: left;
+  flex-wrap: wrap;
+  overflow-wrap: break-word;
+  white-space: normal;
+  border-radius: 7px;
+  padding: 0.5em 0.9em;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+}
+.cafe-modal-address .fa-location-dot {
+  color: #00b14f;
+  font-size: 1.2em;
+  margin-top: 0.15em;
+  flex-shrink: 0;
+  line-height: 1.5;
+}
+.cafe-modal-address span {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  display: block;
+  flex: 1 1 0;
+}
+.cafe-modal-details .cafe-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  background: #00b14f;
+  color: #fff !important;
+  border-radius: 6px;
+  padding: 0.45em 1.1em;
+  font-size: 1.05em;
+  font-weight: 600;
+  text-decoration: none;
+  margin: 0.7em 0 0.5em 0;
+  box-shadow: 0 1px 6px rgba(0, 177, 79, 0.10);
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+}
+.cafe-modal-details .cafe-location .fa-location-dot {
+  color: #fff;
+  font-size: 1.1em;
+  margin-right: 0.3em;
+}
+.cafe-modal-details .cafe-location:hover,
+.cafe-modal-details .cafe-location:focus {
+  background: #008f3a;
+  color: #fff !important;
+  box-shadow: 0 2px 12px rgba(0, 177, 79, 0.18);
+  text-decoration: underline;
+}
+
+/* USER CAN DELETE STYLES */
+
+.delete-comment-btn {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    margin-left: 0.7em;
+    font-size: 1em;
+    transition: color 0.18s;
+    padding: 0.1em 0.3em;
+    border-radius: 4px;
+}
+.delete-comment-btn:hover {
+    color: #b91c1c;
+    background: #ffeaea;
+}
+
+/* View Details Button */
+.view-details-btn {
+  margin-top: 0.7em;
+  background: #00b14f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4em 1.1em;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.view-details-btn:hover {
+  background: #008f3a;
+}
+
+/* FLASHES STYLES */
+.flashes {
+  margin: 1.2em auto 0 auto;
+  max-width: 600px;
+  z-index: 9999;
+}
+.alert {
+  padding: 0.9em 1.5em;
+  border-radius: 7px;
+  margin-bottom: 0.7em;
+  font-size: 1.05em;
+  font-weight: 500;
+  box-shadow: 0 1px 6px rgba(0, 177, 79, 0.10);
+  border: 1.5px solid #e5e7eb;
+}
+.alert-success {
+  background: #e6f9ed;
+  color: #008f3a;
+  border-color: #00b14f;
+}
+.alert-danger, .alert-error {
+  background: #ffeaea;
+  color: #b91c1c;
+  border-color: #ef4444;
+}
+.alert-info {
+  background: #eaf6ff;
+  color: #2563eb;
+  border-color: #2563eb;
+}
+
+/* Utility classes */
+.text-center { text-align: center; }
+.mt-2 { margin-top: 2rem; }
+.mb-2 { margin-bottom: 2rem; }
+
+/* Profile Modal & Forms */
 .close {
   position: absolute;
   right: 1.2rem;
@@ -298,24 +667,20 @@ section h2 {
   cursor: pointer;
   transition: color var(--transition);
 }
-
 .close:hover {
   color: var(--primary-dark);
 }
-
 .profile-form {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
 }
-
 .profile-pic-section {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.7rem;
 }
-
 .profile-pic-large {
   width: 90px;
   height: 90px;
@@ -324,7 +689,6 @@ section h2 {
   border: 2.5px solid var(--primary);
   background: var(--gray);
 }
-
 .profile-fields label {
   display: flex;
   flex-direction: column;
@@ -332,7 +696,6 @@ section h2 {
   color: #333;
   margin-bottom: 0.5rem;
 }
-
 .profile-fields input[type="text"],
 .profile-fields input[type="email"],
 .profile-fields input[type="date"] {
@@ -342,7 +705,6 @@ section h2 {
   font-size: 1rem;
   margin-top: 0.2rem;
 }
-
 .save-btn {
   background: var(--primary);
   color: var(--white);
@@ -355,7 +717,6 @@ section h2 {
   transition: background var(--transition);
   margin-top: 0.7rem;
 }
-
 .save-btn:hover {
   background: var(--primary-dark);
 }
@@ -374,7 +735,6 @@ section h2 {
     max-width: 400px;
   }
 }
-
 @media (max-width: 700px) {
   .navbar {
     flex-direction: column;
@@ -403,9 +763,30 @@ section h2 {
     padding: 1.2rem 0.7rem 1.2rem 0.7rem;
     max-width: 98vw;
   }
+  .cafe-modal-image img {
+    width: 90vw;
+    max-width: 320px;
+    height: 180px;
+  }
+  .cafe-modal-address {
+    max-width: 90vw;
+    font-size: 0.98em;
+  }
+  .rate-comment-form {
+    padding: 0.7em 0.5em;
+    gap: 0.5em;
+  }
+  .rate-comment-form button[type="submit"] {
+    width: 100%;
+    font-size: 1em;
+  }
+  .cafe-modal-details #modalCafeComments {
+    max-height: 14em;
+    min-height: 5em;
+  }
 }
 
-/* Scrollbar styling for a modern look */
+/* Scrollbar styling */
 body, .modal-content {
   scrollbar-width: thin;
   scrollbar-color: var(--primary) var(--gray);
@@ -418,8 +799,3 @@ body::-webkit-scrollbar-thumb, .modal-content::-webkit-scrollbar-thumb {
   background: var(--primary);
   border-radius: 8px;
 }
-
-/* Utility classes */
-.text-center { text-align: center; }
-.mt-2 { margin-top: 2rem; }
-.mb-2 { margin-bottom: 2rem; }

@@ -10,23 +10,34 @@
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
-    <div class="navbar-logo">
-        <i class="fa-solid fa-mug-hot"></i> CafeRadar
-    </div>
-    <ul class="navbar-links">
-        <li><a href="#cafes">Cafes</a></li>
-        <li><a href="#recommended">Recommended</a></li>
-    </ul>
-    <div class="navbar-profile-group">
-        <div class="navbar-profile" onclick="openProfileModal()">
-            <img src="{{ user.profile_pic_url if user.profile_pic_url else url_for('static', filename='default_profile.png') }}" alt="Profile Picture" class="profile-pic">
-            <span>{{ user.username|capitalize }}</span>
+        <div class="navbar-logo">
+            <i class="fa-solid fa-mug-hot"></i> CafeRadar
         </div>
-        <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
-            <i class="fa-solid fa-right-from-bracket"></i>
-        </a>
-    </div>
-</nav>
+        <ul class="navbar-links">
+            <li><a href="#cafes">Cafes</a></li>
+            <li><a href="#recommended">Recommended</a></li>
+        </ul>
+        <div class="navbar-profile-group">
+            <div class="navbar-profile" onclick="openProfileModal()">
+                <img src="{{ user.profile_pic_url if user.profile_pic_url else url_for('static', filename='default_profile.png') }}" alt="Profile Picture" class="profile-pic">
+                <span>{{ user.username|capitalize }}</span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flashes">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
 
     <!-- Main Content -->
     <div class="dashboard-container">
@@ -58,8 +69,34 @@
                                 {{ "%.1f"|format(rating) }} / 5 ({{ rating_count }})
                             </span>
                         </div>
-                        <form method="POST" action="{{ url_for('rate_cafe', cafe_id=cafe._id) }}" class="rate-form">
-                            <label>Rate:
+
+                        <!-- Latest Comment Preview -->
+                         
+                        <div class="cafe-comments cafe-comments-previews">
+                            {% if cafe.comments and cafe.comments|length > 0 %}
+                                {% set latest = cafe.comments[-1] %}
+                                <div class="comment-preview">
+                                    <span class="comment-stars">
+                                        {% set comment_rating = latest.rating if latest.rating is defined and latest.rating is not none else 0 %}
+                                        {% for i in range(1, 6) %}
+                                            {% if i <= comment_rating %}
+                                                <i class="fa-solid fa-star"></i>
+                                            {% else %}
+                                                <i class="fa-regular fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                    <span class="comment-text">"{{ latest.comment }}"</span>
+                                    <span class="comment-user">- {{ latest.user }}</span>
+                                </div>
+                            {% else %}
+                                <em>No comments yet.</em>
+                            {% endif %}
+                        </div>
+                        <!-- Combined Rate and Comment Form -->
+                        <form method="POST" action="{{ url_for('rate_and_comment_cafe', cafe_id=cafe._id) }}" class="rate-comment-form">
+                            <label>
+                                Rate:
                                 <select name="rating" required>
                                     <option value="">--</option>
                                     {% for i in range(1, 6) %}
@@ -67,29 +104,20 @@
                                     {% endfor %}
                                 </select>
                             </label>
+                            <input type="text" name="comment" placeholder="Leave a comment..." required>
                             <button type="submit">Submit</button>
                         </form>
-                        <form method="POST" action="{{ url_for('comment_cafe', cafe_id=cafe._id) }}" class="comment-form">
-                            <input type="text" name="comment" placeholder="Leave a comment..." required>
-                            <button type="submit">Comment</button>
-                        </form>
-                        <div class="cafe-comments">
-                            <strong>Comments:</strong>
-                            {% if cafe.comments %}
-                            <ul>
-                                {% for comment in cafe.comments %}
-                                <li>{{ comment }}</li>
-                                {% endfor %}
-                            </ul>
-                            {% else %}
-                            <em>No comments yet.</em>
-                            {% endif %}
-                        </div>
+                        <!-- View Details Button -->
+                        <button type="button" class="view-details-btn" onclick="openCafeModal({{ loop.index0 }})">
+                            <i class="fa-solid fa-magnifying-glass"></i> View Details
+                        </button>
                     </div>
                 </div>
                 {% endfor %}
             </div>
         </section>
+
+    <!--$$$ Recommendation Section $$$-->
 
         <section id="recommended">
             <h2>Recommended Cafes</h2>
@@ -129,43 +157,120 @@
     </div>
 
     <!-- Profile Modal -->
-    <div id="profileModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeProfileModal()">&times;</span>
-            <h2>Profile Details</h2>
-            <form method="POST" action="{{ url_for('edit_profile') }}" enctype="multipart/form-data" class="profile-form">
-                <div class="profile-pic-section">
-                    <img src="{{ user.profile_pic_url if user.profile_pic_url else url_for('static', filename='default_profile.png') }}" alt="Profile Picture" class="profile-pic-large">
-                    <input type="file" name="profile_pic" accept="image/*">
+    <div id="cafeModal" class="cafe-modal">
+        <div class="cafe-modal-content">
+            <span class="cafe-modal-close" onclick="closeCafeModal()">&times;</span>
+            <div class="cafe-modal-body">
+                <div class="cafe-modal-image">
+                    <img id="modalCafeImg" src="" alt="Cafe image">
+                    <div id="modalCafeAddress" class="cafe-modal-address">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span id="modalCafeAddressText"></span>
+                    </div>
                 </div>
-                <div class="profile-fields">
-                    <label>Username: <input type="text" name="username" value="{{ user.username }}" readonly></label>
-                    <label>First Name: <input type="text" name="first_name" value="{{ user.first_name }}"></label>
-                    <label>Last Name: <input type="text" name="last_name" value="{{ user.last_name }}"></label>
-                    <label>Email: <input type="email" name="email" value="{{ user.email }}"></label>
-                    <label>Gender: <input type="text" name="gender" value="{{ user.gender }}"></label>
-                    <label>Birthday: <input type="date" name="birthday" value="{{ user.birthday }}"></label>
-                    <label>Sex: <input type="text" name="sex" value="{{ user.sex }}"></label>
-                    <label>Contact Number: <input type="text" name="contactnumber" value="{{ user.contactnumber }}"></label>
+                <div class="cafe-modal-details">
+                    <h2 id="modalCafeName"></h2>
+                    <p id="modalCafeDesc"></p>
+                    <div id="modalCafeRating"></div>
+                    <div id="modalCafeLocation"></div>
+                    <div class="cafe-comments">
+                        <strong>All Comments:</strong>
+                        <ul id="modalCafeComments"></ul>
+                    </div>
                 </div>
-                <button type="submit" class="save-btn">Save Changes</button>
-            </form>
+            </div>
         </div>
     </div>
 
     <script>
-        function openProfileModal() {
-            document.getElementById('profileModal').style.display = 'block';
+    const currentUsername = "{{ user.username|e }}";
+
+        function formatDate(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString(undefined, options);
+        }
+        
+        const cafes = {{ cafes|tojson }};
+        function openCafeModal(idx) {
+            const cafe = cafes[idx];
+            document.getElementById('modalCafeImg').src = cafe.image_url || "{{ url_for('static', filename='default_cafe.jpg') }}";
+            // Address (NEW)
+            let addressHtml = '';
+            if (cafe.address) {
+                addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>${cafe.address}</span>`;
+            } else {
+                addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>No address provided</span>`;
+            }
+            document.getElementById('modalCafeAddress').innerHTML = addressHtml;
+
+            document.getElementById('modalCafeName').textContent = cafe.name;
+            document.getElementById('modalCafeDesc').textContent = cafe.description;
+            // Rating
+            let ratingHtml = '';
+            let ratings = cafe.ratings || [];
+            let ratingSum = ratings.reduce((a, b) => a + (b.rating || 0), 0);
+            let ratingCount = ratings.length;
+            let avgRating = ratingCount ? ratingSum / ratingCount : 0;
+            for (let i = 1; i <= 5; i++) {
+                ratingHtml += i <= avgRating
+                    ? '<i class="fa-solid fa-star" style="color:#ffd700"></i>'
+                    : '<i class="fa-regular fa-star" style="color:#ffd700"></i>';
+            }
+            ratingHtml += `<span class="rating-number">${avgRating.toFixed(1)} / 5 (${ratingCount})</span>`;
+            document.getElementById('modalCafeRating').innerHTML = ratingHtml;
+            // Location
+            document.getElementById('modalCafeLocation').innerHTML = `<a href="${cafe.maps_url}" target="_blank" class="cafe-location"><i class="fa-solid fa-location-dot"></i> View on Maps</a>`;
+            // Comments
+            let commentsHtml = '';
+            if (cafe.comments && cafe.comments.length > 0) {
+                cafe.comments.forEach(c => {
+                    let stars = '';
+                    let commentRating = c.rating !== undefined && c.rating !== null ? c.rating : 0;
+                    for (let i = 1; i <= 5; i++) {
+                        stars += i <= commentRating
+                            ? '<i class="fa-solid fa-star"></i>'
+                            : '<i class="fa-regular fa-star"></i>';
+                    }
+
+                    let deleteBtn = '';
+                    if (c.user === currentUsername && c._id) {
+                        deleteBtn = `
+                            <form method="POST" action="/delete_comment/${cafe._id}/${c._id}" style="display:inline;">
+                                <button type="submit" class="delete-comment-btn" title="Delete comment" onclick="return confirm('Delete this comment?')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        `;
+                    }
+
+                    commentsHtml += `<li>
+                        <span class="comment-stars">${stars}</span>
+                        <span class="comment-text">"${c.comment}"</span>
+                        <span class="comment-meta">
+                            <span class="comment-user">${c.user}</span>
+                            ${c.timestamp ? `<span class="comment-date">${formatDate(c.timestamp)}</span>` : ''}
+                            ${deleteBtn}
+                        </span>
+                    </li>`;
+                });
+            } else {
+                commentsHtml = '<li><em>No comments yet.</em></li>';
+            }
+            document.getElementById('modalCafeComments').innerHTML = commentsHtml;
+            
+            document.getElementById('cafeModal').style.display = 'block';
             document.body.style.overflow = 'hidden';
         }
-        function closeProfileModal() {
-            document.getElementById('profileModal').style.display = 'none';
+        function closeCafeModal() {
+            document.getElementById('cafeModal').style.display = 'none';
             document.body.style.overflow = '';
         }
         window.onclick = function(event) {
-            const modal = document.getElementById('profileModal');
+            const modal = document.getElementById('cafeModal');
             if (event.target == modal) {
-                closeProfileModal();
+                closeCafeModal();
             }
         }
     </script>

@@ -66,6 +66,10 @@
         required />
     </label>
     <label>
+      Address:
+      <input type="text" name="address" placeholder="Cafe address..." required />
+    </label>
+    <label>
       Cafe Image:
       <input type="file" name="image" accept="image/*" required />
     </label>
@@ -110,15 +114,14 @@
         </span>
       </div>
       <div class="cafe-comments">
-        <strong>Comments:</strong>
-        {% if cafe.comments %}
-        <ul>
-          {% for comment in cafe.comments %}
-          <li>{{ comment }}</li>
-          {% endfor %}
-        </ul>
+        {% if cafe.comments and cafe.comments|length > 0 %}
+          <span class="comment-preview">
+            <i class="fa-solid fa-comment-dots" style="color:#2563eb;margin-right:0.4em;"></i>
+            "{{ cafe.comments[-1].comment }}"
+            <span class="comment-user">- {{ cafe.comments[-1].user }}</span>
+          </span>
         {% else %}
-        <em>No comments</em>
+          <em>No comments yet</em>
         {% endif %}
       </div>
       <div class="cafe-location">
@@ -150,117 +153,180 @@
 </div>
 
 <!-- Cafe Details Modal -->
-<div id="cafeModal" class="cafe-modal" tabindex="-1" aria-hidden="true">
-  <div class="cafe-modal-content" id="cafeModalContent">
-    <span class="cafe-modal-close" onclick="closeCafeModal()">&times;</span>
-    <div class="cafe-modal-body">
-      <div class="cafe-modal-image">
-        <img id="modalCafeImg" src="" alt="Cafe image" />
-      </div>
-      <div class="cafe-modal-details">
-        <h2 id="modalCafeName"></h2>
-        <p id="modalCafeDesc"></p>
-        <div id="modalCafeRating" class="cafe-rating"></div>
-        <div id="modalCafeRatingBreakdown" class="cafe-rating-breakdown"></div>
-        <div id="modalCafeComments" class="cafe-comments"></div>
-        <div id="modalCafeLocation" class="cafe-location"></div>
-      </div>
+<!-- Synchronized Admin Modal (matches user_dashboard.html) -->
+<div id="cafeModal" class="cafe-modal">
+    <div class="cafe-modal-content">
+          <span class="cafe-modal-close" onclick="closeCafeModal()">&times;</span>
+          <div class="cafe-modal-body">
+            <div class="cafe-modal-image">
+              <img id="modalCafeImg" src="" alt="Cafe image">
+              <div id="modalCafeAddress" class="cafe-modal-address">
+                <i class="fa-solid fa-location-dot"></i>
+                <span id="modalCafeAddressText"></span>
+              </div>
+            </div>
+            <div class="cafe-modal-details">
+              <h2 id="modalCafeName"></h2>
+              <p id="modalCafeDesc"></p>
+              <div id="modalCafeRating"></div>
+              <div id="modalCafeRatingBreakdown"></div>
+              <div id="modalCafeLocation"></div>
+              <div class="cafe-comments">
+                <strong>All Comments:</strong>
+                <ul id="modalCafeComments" class="modal-comments-list"></ul>
+              </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <script>
- function showCafeModal(card) {
-  const cafe = JSON.parse(card.getAttribute("data-cafe"));
+  function adminDeleteComment(cafeId, commentId, btn) {
+    if (!confirm("Delete this comment?")) return;
+    fetch(`/admin_delete_comment/${cafeId}/${commentId}`, {
+      method: "POST",
+      headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        // Remove the comment from the modal instantly
+        const li = btn.closest('li');
+        if (li) li.remove();
+        // Optionally, show a flash message or notification
+      } else {
+        alert(data.msg || "Failed to delete comment.");
+      }
+    })
+    .catch(() => alert("Failed to delete comment."));
+  }
 
-  // Set image
-  document.getElementById("modalCafeImg").src =
+  // Format date as "Mon DD, YYYY"
+  function formatDate(isoString) {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
+  }
+
+  function showCafeModal(card) {
+    const cafe = JSON.parse(card.getAttribute("data-cafe"));
+    document.getElementById("modalCafeImg").src =
     cafe.image_url || "{{ url_for('static', filename='default_cafe.jpg') }}";
-  document.getElementById("modalCafeImg").alt = cafe.name + " image";
-  // Set name and description
-  document.getElementById("modalCafeName").textContent = cafe.name;
-  document.getElementById("modalCafeDesc").textContent = cafe.description;
+    document.getElementById("modalCafeImg").alt = cafe.name + " image";
 
-  // --- Ratings Breakdown ---
-  // cafe.ratings: [{user, rating, timestamp}]
-  let ratingCounts = [0, 0, 0, 0, 0, 0]; // index 1-5
-  let userReviewCounts = {}; // username: count
-  let totalRating = 0;
-  let ratings = cafe.ratings || [];
-  ratings.forEach(r => {
-    ratingCounts[r.rating] = (ratingCounts[r.rating] || 0) + 1;
-    userReviewCounts[r.user] = (userReviewCounts[r.user] || 0) + 1;
-    totalRating += r.rating;
-  });
-  let avgRating = ratings.length ? (totalRating / ratings.length) : 0;
+    // Address
+    let addressHtml = '';
+    if (cafe.address) {
+      addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>${cafe.address}</span>`;
+    } else {
+      addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>No address provided</span>`;
+    }
+    document.getElementById('modalCafeAddress').innerHTML = addressHtml;
 
-  // This how stars and average of stars
-  let stars = "";
-  for (let i = 1; i <= 5; i++) {
-    stars += i <= avgRating
-      ? '<i class="fa-solid fa-star" style="color:#ffd700"></i>'
-      : '<i class="fa-regular fa-star" style="color:#ffd700"></i>';
-  }
-  stars += `<span class="rating-number" style="margin-left:0.5rem;color:#888;font-size:0.98rem;">
-    ${avgRating.toFixed(1)} / 5 (${ratings.length})
-  </span>`;
-  document.getElementById("modalCafeRating").innerHTML = stars;
-
-  // Show rating breakdown
-  let breakdownHtml = `<div style="margin:0.5rem 0 1rem 0;"><strong>Rating Breakdown:</strong><br>`;
-  for (let i = 5; i >= 1; i--) {
-    breakdownHtml += `
-      <span style="display:inline-block;width:2rem;">${i} <i class="fa-solid fa-star" style="color:#ffd700"></i></span>
-      <span style="display:inline-block;width:2.5rem;">${ratingCounts[i] || 0}</span>
-      <div style="display:inline-block;width:60%;background:#e5e7eb;height:8px;border-radius:4px;vertical-align:middle;">
-        <div style="width:${ratings.length ? ((ratingCounts[i]||0)/ratings.length*100) : 0}%;background:#00b14f;height:8px;border-radius:4px;"></div>
-      </div>
-      <br>
-    `;
-  }
-  breakdownHtml += `</div>`;
-  document.getElementById("modalCafeRatingBreakdown").innerHTML = breakdownHtml;
-
-  // --- Comments with user and time ---
-  // cafe.comments: [{user, comment, timestamp}]
-  let comments = cafe.comments || [];
-  let commentsHtml = "<strong>Comments:</strong>";
-  if (comments.length > 0) {
-    commentsHtml += "<ul style='margin-top:0.5rem;'>";
-    comments.forEach(c => {
-      // Format timestamp (assume ISO string)
-      let dateStr = c.timestamp ? new Date(c.timestamp).toLocaleString() : '';
-      let reviewCount = userReviewCounts[c.user] || 1;
-      commentsHtml += `<li style="margin-bottom:0.7rem;">
-        <span style="font-weight:600;color:#00b14f;">${c.user}</span>
-        <span style="color:#888;font-size:0.95em;">(${dateStr})</span>
-        <span style="color:#888;font-size:0.95em;">- ${reviewCount} review${reviewCount>1?'s':''}</span>
-        <br>
-        <span>${c.comment}</span>
-      </li>`;
+    // Ratings
+    let ratingCounts = [0, 0, 0, 0, 0, 0]; // index 1-5
+    let userReviewCounts = {};
+    let totalRating = 0;
+    let ratings = cafe.ratings || [];
+    ratings.forEach(r => {
+      ratingCounts[r.rating] = (ratingCounts[r.rating] || 0) + 1;
+      userReviewCounts[r.user] = (userReviewCounts[r.user] || 0) + 1;
+      totalRating += r.rating;
     });
-    commentsHtml += "</ul>";
-  } else {
-    commentsHtml += "<em>No comments</em>";
-  }
-  document.getElementById("modalCafeComments").innerHTML = commentsHtml;
+    let avgRating = ratings.length ? (totalRating / ratings.length) : 0;
 
-  // Set location
-  if (cafe.maps_url) {
-    document.getElementById(
-      "modalCafeLocation"
-    ).innerHTML = `<a href="${cafe.maps_url}" target="_blank" rel="noopener">
-      <i class="fa-solid fa-location-dot"></i> View Location
-    </a>`;
-  } else {
-    document.getElementById("modalCafeLocation").innerHTML = "";
-  }
-  // Show modal
-  document.getElementById("cafeModal").classList.add("show");
-  document.body.style.overflow = "hidden";
-}
+    // Stars and average
+    let stars = "";
+    for (let i = 1; i <= 5; i++) {
+      stars += i <= avgRating
+        ? '<i class="fa-solid fa-star" style="color:#ffd700"></i>'
+        : '<i class="fa-regular fa-star" style="color:#ffd700"></i>';
+    }
+    stars += `<span class="rating-number" style="margin-left:0.5rem;color:#888;font-size:0.98rem;">
+      ${avgRating.toFixed(1)} / 5 (${ratings.length})
+    </span>`;
+    document.getElementById("modalCafeRating").innerHTML = stars;
 
-// Close modal on click of close button or outside modal content
+    // Rating breakdown
+    let breakdownHtml = `<div style="margin:0.5rem 0 1rem 0;"><strong>Rating Breakdown:</strong><br>`;
+    for (let i = 5; i >= 1; i--) {
+      breakdownHtml += `
+        <span style="display:inline-block;width:2rem;">${i} <i class="fa-solid fa-star" style="color:#ffd700"></i></span>
+        <span style="display:inline-block;width:2.5rem;">${ratingCounts[i] || 0}</span>
+        <div style="display:inline-block;width:60%;background:#e5e7eb;height:8px;border-radius:4px;vertical-align:middle;">
+          <div style="width:${ratings.length ? ((ratingCounts[i]||0)/ratings.length*100) : 0}%;background:#2563eb;height:8px;border-radius:4px;"></div>
+        </div>
+        <br>
+      `;
+    }
+    breakdownHtml += `</div>`;
+    document.getElementById("modalCafeRatingBreakdown").innerHTML = breakdownHtml;
+
+    // Comments (synchronized with user modal)
+    let comments = cafe.comments || [];
+    let commentsHtml = "";
+    if (comments.length > 0) {
+      comments.forEach(c => {
+        // Find user's rating for this comment (by user and timestamp)
+        let userRating = 0;
+        if (Array.isArray(ratings)) {
+          let found = ratings.find(r => r.user === c.user && r.timestamp === c.timestamp);
+          userRating = found ? found.rating : 0;
+        }
+        let starsHtml = '';
+        for (let i = 1; i <= 5; i++) {
+          starsHtml += i <= userRating
+            ? '<i class="fa-solid fa-star"></i>'
+            : '<i class="fa-regular fa-star"></i>';
+        }
+
+        let deleteBtn = '';
+          if (c._id && cafe._id) {
+            deleteBtn = `
+              <button class="admin-delete-comment-btn" title="Delete comment"
+                onclick="adminDeleteComment('${cafe._id}', '${c._id}', this)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            `;
+          }
+
+        commentsHtml += `<li>
+          <span class="comment-stars">${starsHtml}</span>
+          <span class="comment-text">"${c.comment}"</span>
+          <span class="comment-meta">
+            <span class="comment-user">${c.user}</span>
+            <span class="comment-date">${formatDate(c.timestamp)}</span>
+            ${deleteBtn}
+          </span>
+        </li>`;
+      });
+    } else {
+      commentsHtml = '<li><em>No comments yet.</em></li>';
+    }
+    // Use the modal-comments-list class for styling
+    document.getElementById("modalCafeComments").innerHTML = commentsHtml;
+
+    // Set location
+    if (cafe.maps_url) {
+      document.getElementById(
+        "modalCafeLocation"
+      ).innerHTML = `<a href="${cafe.maps_url}" target="_blank" rel="noopener" class="cafe-location">
+        <i class="fa-solid fa-location-dot"></i> View Location
+      </a>`;
+    } else {
+      document.getElementById("modalCafeLocation").innerHTML = "";
+    }
+
+    // Set modal title and description
+    document.getElementById("modalCafeName").textContent = cafe.name || "";
+    document.getElementById("modalCafeDesc").textContent = cafe.description || "";
+
+    // Show modal
+    document.getElementById("cafeModal").classList.add("show");
+    document.body.style.overflow = "hidden";
+  }
+
   function closeCafeModal() {
     document.getElementById("cafeModal").classList.remove("show");
     document.body.style.overflow = "";

@@ -512,6 +512,8 @@ footer {
 }
 
 /* ----- MODAL STYLES FOR WHEN CLICKING THE CAFE TO ENLARGE DETAILS DO NOT CHANGE ----- */
+/* --- Cafe Modal (Synchronized with User Dashboard) --- */
+/* --- Synchronized Admin Modal Styles --- */
 .cafe-modal {
   display: none;
   position: fixed;
@@ -529,12 +531,8 @@ footer {
   animation: fadeIn 0.25s;
 }
 @keyframes fadeIn {
-  from {
-    background: rgba(0, 0, 0, 0);
-  }
-  to {
-    background: rgba(0, 0, 0, 0.45);
-  }
+  from { background: rgba(0, 0, 0, 0); }
+  to { background: rgba(0, 0, 0, 0.45); }
 }
 .cafe-modal-content {
   background: #fff;
@@ -548,14 +546,8 @@ footer {
   padding: 0;
 }
 @keyframes zoomIn {
-  from {
-    transform: scale(0.85);
-    opacity: 0.5;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from { transform: scale(0.85); opacity: 0.5; }
+  to { transform: scale(1); opacity: 1; }
 }
 .cafe-modal-close {
   position: absolute;
@@ -584,6 +576,42 @@ footer {
   background: #f5f5f5;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
 }
+.cafe-modal-address {
+  margin-top: 0.7em;
+  color: #444;
+  font-size: 1.05em;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+  word-break: break-word;
+  max-width: 260px;
+  width: 100%;
+  text-align: left;
+  flex-wrap: wrap;
+  overflow-wrap: break-word;
+  white-space: normal;
+  box-sizing: border-box;
+  background: #e5e7eb;
+  border-radius: 7px;
+  padding: 0.5em 0.9em;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+}
+.cafe-modal-address .fa-location-dot {
+  color: #2563eb;
+  font-size: 1.2em;
+  margin-top: 0.15em;
+  flex-shrink: 0;
+  line-height: 1.5;
+}
+.cafe-modal-address span {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  display: block;
+  flex: 1 1 0;
+}
 .cafe-modal-details {
   flex: 1;
   display: flex;
@@ -603,17 +631,140 @@ footer {
   margin: 0.5rem 0 0.2rem 0;
 }
 .cafe-modal-details .cafe-comments {
-  font-size: 1rem;
-  color: #444;
+  background: #f6fff9;
+  border-radius: 10px;
+  padding: 1.1em 1.3em;
+  margin-top: 1.2em;
+  margin-bottom: 1.2em;
+  min-height: 12em;
+  max-height: 28em;
+  box-shadow: 0 1px 6px rgba(0, 177, 79, 0.07);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.cafe-modal-details .cafe-comments > strong {
+  margin-bottom: 0.7em;
+  color: #2563eb;
+  font-size: 1.08em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  display: block;
+}
+.cafe-modal-details .modal-comments-list {
+  flex: 1 1 auto;
+  min-height: 7em;
+  max-height: 19rem;
+  overflow-y: auto;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1em;
+  scrollbar-width: thin;
+  scrollbar-color: #2563eb #e5e7eb;
+}
+.cafe-modal-details .modal-comments-list::-webkit-scrollbar {
+  width: 8px;
+  background: #e5e7eb;
+}
+.cafe-modal-details .modal-comments-list::-webkit-scrollbar-thumb {
+  background: #2563eb;
+  border-radius: 8px;
+}
+.cafe-modal-details .modal-comments-list li {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 177, 79, 0.07);
+  padding: 1em 1.2em 0.9em 1.2em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.cafe-modal-details .modal-comments-list .comment-stars {
+  margin-bottom: 0.3em;
+  display: flex;
+  flex-direction: row;
+  gap: 0.08em;
+}
+.cafe-modal-details .modal-comments-list .comment-stars i {
+  color: #ffd700;
+  font-size: 1.15em;
+  vertical-align: middle;
+  filter: drop-shadow(0 1px 2px #ffe06655);
+}
+.cafe-modal-details .modal-comments-list .comment-text {
+  color: grey;
+  font-style: italic;
+  font-size: 1em;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 0.2em;
+}
+.cafe-modal-details .modal-comments-list .comment-meta {
+  color: #888;
+  font-style: normal;
+  font-size: 0.97em;
+  margin-top: 0.1em;
+  font-weight: 500;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  display: flex;
+  gap: 0.7em;
+}
+.cafe-modal-details .modal-comments-list .comment-user {
+  font-weight: 600;
+  color: #2563eb;
+}
+.cafe-modal-details .modal-comments-list .comment-date {
+  color: #888;
+  font-size: 0.95em;
+}
+.cafe-modal-details .modal-comments-list:empty::before {
+  content: "No comments yet.";
+  display: block;
+  min-height: 7em;
+  line-height: 7em;
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  font-size: 1.05em;
+  width: 100%;
 }
 .cafe-modal-details .cafe-location {
-  margin-top: 0.5rem;
-}
-.cafe-modal-details .cafe-location a {
-  color: #0077cc;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  background: #2563eb;
+  color: #fff !important;
+  border-radius: 6px;
+  padding: 0.45em 1.1em;
+  font-size: 1.05em;
+  font-weight: 600;
   text-decoration: none;
-  font-size: 1.1rem;
+  margin: 0.7em 0 0.5em 0;
+  box-shadow: 0 1px 6px rgba(37, 99, 235, 0.10);
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
 }
+.cafe-modal-details .cafe-location .fa-location-dot {
+  color: #fff;
+  font-size: 1.1em;
+  margin-right: 0.3em;
+}
+.cafe-modal-details .cafe-location:hover,
+.cafe-modal-details .cafe-location:focus {
+  background: #1e40af;
+  color: #fff !important;
+  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.18);
+}
+
 @media (max-width: 700px) {
   .cafe-modal-body {
     flex-direction: column;
@@ -629,6 +780,33 @@ footer {
   .cafe-modal-details h2 {
     font-size: 1.3rem;
   }
+  .cafe-modal-address {
+    max-width: 90vw;
+    font-size: 0.98em;
+  }
+  .cafe-modal-details .modal-comments-list {
+    max-height: 14em;
+    min-height: 5em;
+  }
+}
+
+/* DELETE BUTTON FOR ADMIN */
+
+.admin-delete-comment-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  margin-left: 0.7em;
+  font-size: 1em;
+  transition: color 0.18s;
+  padding: 0.1em 0.3em;
+  border-radius: 4px;
+}
+
+.admin-delete-comment-btn:hover {
+  color: #b91c1c;
+  background: #ffeaea;
 }
 
 /* FOR EDIT TAB DO NOT CHANGE ADMIN ONLY */
@@ -743,10 +921,35 @@ footer {
 
 /* FLASHES MESSAGES DESIGN STYLES */
 
-.flashes { margin-bottom: 1rem; }
-.alert { padding: 10px 20px; border-radius: 5px; margin-bottom: 10px; }
-.alert-success { background: #d4edda; color: #155724; }
-.alert-error, .alert-danger { background: #f8d7da; color: #721c24; }
+.flashes {
+  margin: 1.2em auto 0 auto;
+  max-width: 600px;
+  z-index: 9999;
+}
+.alert {
+  padding: 0.9em 1.5em;
+  border-radius: 7px;
+  margin-bottom: 0.7em;
+  font-size: 1.05em;
+  font-weight: 500;
+  box-shadow: 0 1px 6px rgba(0, 177, 79, 0.10);
+  border: 1.5px solid #e5e7eb;
+}
+.alert-success {
+  background: #e6f9ed;
+  color: #008f3a;
+  border-color: #00b14f;
+}
+.alert-danger, .alert-error {
+  background: #ffeaea;
+  color: #b91c1c;
+  border-color: #ef4444;
+}
+.alert-info {
+  background: #eaf6ff;
+  color: #2563eb;
+  border-color: #2563eb;
+}
 
 /* CSS FOR ADMIN_USER.HTML STYLES ONLY FOR ADMIN */
 
@@ -845,6 +1048,8 @@ footer {
   color: #888;
   cursor: pointer;
 }
+
+
 
 @media (max-width: 700px) {
   .user-item {
