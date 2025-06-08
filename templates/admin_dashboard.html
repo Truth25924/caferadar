@@ -1,38 +1,280 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Admin Dashboard - Cafe Radar</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
-</head>
-<body>
-  <header>
-    <h1>Cafe Radar - Admin</h1>
-    <nav class="nav-links">
-      <a href="/dashboard">Dashboard</a>
-      <a href="/admin/users">Users</a>
-      <a href="/profile">Profile</a>
-      <a href="/logout">Logout</a>
-    </nav>
-  </header>
+{% extends "base.html" %} {% block content %}
 
-  <h2>Cafe Recommendations</h2>
-  <div class="card-container">
-    <div class="cafe-card">
-      <h3>Bean Haven</h3>
-      <p>Cozy nook with top-tier espresso and comfy seating.</p>
-      <button class="edit-btn">Edit</button>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flashes">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
     </div>
-    <div class="cafe-card">
-      <h3>Latte Lounge</h3>
-      <p>Modern cafe with latte art and delicious brunch options.</p>
-      <button class="edit-btn">Edit</button>
+  {% endif %}
+{% endwith %}
+
+<div class="cardBox">
+  <div class="card">
+    <div>
+      <div class="numbers">{{ session['username']|capitalize }}</div>
+      <div class="cardName">Admin</div>
     </div>
-    <div class="cafe-card">
-      <h3>Brew & Chill</h3>
-      <p>Great spot for late-night studying and strong brews.</p>
-      <button class="edit-btn">Edit</button>
+    <div class="iconBx">
+      <i class="fa-solid fa-user-shield"></i>
     </div>
   </div>
-</body>
-</html>
+  <div class="card">
+    <div>
+      <div class="numbers">{{ cafes|length }}</div>
+      <div class="cardName">Cafes Uploaded</div>
+    </div>
+    <div class="iconBx">
+      <i class="fa-solid fa-mug-hot"></i>
+    </div>
+  </div>
+  <div class="card">
+    <div>
+      <div class="numbers">{{ users|length }}</div>
+      <div class="cardName">Accounts</div>
+    </div>
+    <div class="iconBx">
+      <i class="fa-solid fa-users"></i>
+    </div>
+  </div>
+</div>
+
+<!-- Add Cafe Form with Image Upload -->
+<div class="add-cafe-form">
+  <h3>Add New Cafe Recommendation</h3>
+  <form
+    method="POST"
+    action="{{ url_for('add_cafe') }}"
+    enctype="multipart/form-data">
+    <label>
+      Cafe Name:
+      <input type="text" name="name" required />
+    </label>
+    <label>
+      Description:
+      <textarea name="description" required></textarea>
+    </label>
+    <label>
+      Google Maps Link:
+      <input
+        type="url"
+        name="maps_url"
+        placeholder="https://maps.google.com/..."
+        required />
+    </label>
+    <label>
+      Cafe Image:
+      <input type="file" name="image" accept="image/*" required />
+    </label>
+    <button type="submit">Add Cafe</button>
+  </form>
+</div>
+
+<!-- Cafe List as Flex Cards -->
+<div class="cafe-list-flex">
+  {% for cafe in cafes %}
+  <div
+    class="cafe-card"
+    tabindex="0"
+    data-cafe='{{ cafe | tojson | safe }}'
+    onclick="showCafeModal(this)">
+    <div class="cafe-image">
+      {% if cafe.image_url %}
+      <img src="{{ cafe.image_url }}" alt="{{ cafe.name }} image" />
+      {% else %}
+      <img
+        src="{{ url_for('static', filename='default_cafe.jpg') }}"
+        alt="Default cafe image" />
+      {% endif %}
+    </div>
+    <div class="cafe-info">
+      <h4>{{ cafe.name }}</h4>
+      <p>{{ cafe.description }}</p>
+      <div class="cafe-rating">
+        {% set ratings = cafe.ratings if cafe.ratings else [] %}
+        {% set rating_sum = ratings | map(attribute='rating') | sum %}
+        {% set rating_count = ratings | length %}
+        {% set rating = (rating_sum / rating_count) if rating_count else 0 %}
+        
+        {% for i in range(1, 6) %} {% if i <= rating %}
+        <i class="fa-solid fa-star" style="color: #ffd700"></i>
+        {% else %}
+        <i class="fa-regular fa-star" style="color: #ffd700"></i>
+        {% endif %} {% endfor %}
+        <span class="rating-number">
+          {{ "%.1f"|format(rating) }} / 5 ({{ cafe.ratings|length if
+          cafe.ratings else 0 }})
+        </span>
+      </div>
+      <div class="cafe-comments">
+        <strong>Comments:</strong>
+        {% if cafe.comments %}
+        <ul>
+          {% for comment in cafe.comments %}
+          <li>{{ comment }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <em>No comments</em>
+        {% endif %}
+      </div>
+      <div class="cafe-location">
+        <a href="{{ cafe.maps_url }}" target="_blank" rel="noopener">
+          <i class="fa-solid fa-location-dot"></i> View Location
+        </a>
+      </div>
+      <div class="cafe-actions" onclick="event.stopPropagation();">
+        <form
+          method="POST"
+          action="{{ url_for('delete_cafe', cafe_id=cafe._id) }}"
+          style="display: inline">
+          <button
+            type="submit"
+            class="btn-danger"
+            onclick="return confirm('Delete this cafe?');">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </form>
+        <button
+          class="btn-approve"
+          onclick="window.location.href='{{ url_for('edit_cafe', cafe_id=cafe._id) }}';">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Cafe Details Modal -->
+<div id="cafeModal" class="cafe-modal" tabindex="-1" aria-hidden="true">
+  <div class="cafe-modal-content" id="cafeModalContent">
+    <span class="cafe-modal-close" onclick="closeCafeModal()">&times;</span>
+    <div class="cafe-modal-body">
+      <div class="cafe-modal-image">
+        <img id="modalCafeImg" src="" alt="Cafe image" />
+      </div>
+      <div class="cafe-modal-details">
+        <h2 id="modalCafeName"></h2>
+        <p id="modalCafeDesc"></p>
+        <div id="modalCafeRating" class="cafe-rating"></div>
+        <div id="modalCafeRatingBreakdown" class="cafe-rating-breakdown"></div>
+        <div id="modalCafeComments" class="cafe-comments"></div>
+        <div id="modalCafeLocation" class="cafe-location"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+ function showCafeModal(card) {
+  const cafe = JSON.parse(card.getAttribute("data-cafe"));
+
+  // Set image
+  document.getElementById("modalCafeImg").src =
+    cafe.image_url || "{{ url_for('static', filename='default_cafe.jpg') }}";
+  document.getElementById("modalCafeImg").alt = cafe.name + " image";
+  // Set name and description
+  document.getElementById("modalCafeName").textContent = cafe.name;
+  document.getElementById("modalCafeDesc").textContent = cafe.description;
+
+  // --- Ratings Breakdown ---
+  // cafe.ratings: [{user, rating, timestamp}]
+  let ratingCounts = [0, 0, 0, 0, 0, 0]; // index 1-5
+  let userReviewCounts = {}; // username: count
+  let totalRating = 0;
+  let ratings = cafe.ratings || [];
+  ratings.forEach(r => {
+    ratingCounts[r.rating] = (ratingCounts[r.rating] || 0) + 1;
+    userReviewCounts[r.user] = (userReviewCounts[r.user] || 0) + 1;
+    totalRating += r.rating;
+  });
+  let avgRating = ratings.length ? (totalRating / ratings.length) : 0;
+
+  // This how stars and average of stars
+  let stars = "";
+  for (let i = 1; i <= 5; i++) {
+    stars += i <= avgRating
+      ? '<i class="fa-solid fa-star" style="color:#ffd700"></i>'
+      : '<i class="fa-regular fa-star" style="color:#ffd700"></i>';
+  }
+  stars += `<span class="rating-number" style="margin-left:0.5rem;color:#888;font-size:0.98rem;">
+    ${avgRating.toFixed(1)} / 5 (${ratings.length})
+  </span>`;
+  document.getElementById("modalCafeRating").innerHTML = stars;
+
+  // Show rating breakdown
+  let breakdownHtml = `<div style="margin:0.5rem 0 1rem 0;"><strong>Rating Breakdown:</strong><br>`;
+  for (let i = 5; i >= 1; i--) {
+    breakdownHtml += `
+      <span style="display:inline-block;width:2rem;">${i} <i class="fa-solid fa-star" style="color:#ffd700"></i></span>
+      <span style="display:inline-block;width:2.5rem;">${ratingCounts[i] || 0}</span>
+      <div style="display:inline-block;width:60%;background:#e5e7eb;height:8px;border-radius:4px;vertical-align:middle;">
+        <div style="width:${ratings.length ? ((ratingCounts[i]||0)/ratings.length*100) : 0}%;background:#00b14f;height:8px;border-radius:4px;"></div>
+      </div>
+      <br>
+    `;
+  }
+  breakdownHtml += `</div>`;
+  document.getElementById("modalCafeRatingBreakdown").innerHTML = breakdownHtml;
+
+  // --- Comments with user and time ---
+  // cafe.comments: [{user, comment, timestamp}]
+  let comments = cafe.comments || [];
+  let commentsHtml = "<strong>Comments:</strong>";
+  if (comments.length > 0) {
+    commentsHtml += "<ul style='margin-top:0.5rem;'>";
+    comments.forEach(c => {
+      // Format timestamp (assume ISO string)
+      let dateStr = c.timestamp ? new Date(c.timestamp).toLocaleString() : '';
+      let reviewCount = userReviewCounts[c.user] || 1;
+      commentsHtml += `<li style="margin-bottom:0.7rem;">
+        <span style="font-weight:600;color:#00b14f;">${c.user}</span>
+        <span style="color:#888;font-size:0.95em;">(${dateStr})</span>
+        <span style="color:#888;font-size:0.95em;">- ${reviewCount} review${reviewCount>1?'s':''}</span>
+        <br>
+        <span>${c.comment}</span>
+      </li>`;
+    });
+    commentsHtml += "</ul>";
+  } else {
+    commentsHtml += "<em>No comments</em>";
+  }
+  document.getElementById("modalCafeComments").innerHTML = commentsHtml;
+
+  // Set location
+  if (cafe.maps_url) {
+    document.getElementById(
+      "modalCafeLocation"
+    ).innerHTML = `<a href="${cafe.maps_url}" target="_blank" rel="noopener">
+      <i class="fa-solid fa-location-dot"></i> View Location
+    </a>`;
+  } else {
+    document.getElementById("modalCafeLocation").innerHTML = "";
+  }
+  // Show modal
+  document.getElementById("cafeModal").classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+
+// Close modal on click of close button or outside modal content
+  function closeCafeModal() {
+    document.getElementById("cafeModal").classList.remove("show");
+    document.body.style.overflow = "";
+  }
+
+  // Close modal on ESC key
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeCafeModal();
+  });
+
+  // Close modal if click outside content
+  document.getElementById("cafeModal").addEventListener("click", function (e) {
+    if (e.target === this) closeCafeModal();
+  });
+</script>
+
+{% endblock %}

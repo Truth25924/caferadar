@@ -1,77 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>User Management - Cafe Radar</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-  <style>
-    .user-list {
-      padding: 20px;
-    }
+{% extends "base.html"%} {% block content %}
 
-    .user-item {
-      background-color: white;
-      padding: 15px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .user-info {
-      font-size: 16px;
-    }
-
-    .user-actions button {
-      margin-left: 10px;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      color: white;
-    }
-
-    .edit-btn {
-      background-color: #3c7b3c;
-    }
-
-    .delete-btn {
-      background-color: #c0392b;
-    }
-
-    .edit-btn:hover {
-      background-color: #2e5d2e;
-    }
-
-    .delete-btn:hover {
-      background-color: #992d22;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>Cafe Radar - Admin</h1>
-    <nav class="nav-links">
-      <a href="/dashboard">Dashboard</a>
-      <a href="/admin/users">Users</a>
-      <a href="/profile">Profile</a>
-      <a href="/logout">Logout</a>
-    </nav>
-  </header>
-
-  <h2>Manage Users</h2>
-  <div class="user-list">
-    {% for user in users %}
-      <div class="user-item">
-        <div class="user-info">{{ user.username }} - {{ user.role }}</div>
-        <div class="user-actions">
-          <button class="edit-btn">Edit</button>
-          <button class="delete-btn">Delete</button>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flashes">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          {{ message }}
         </div>
-      </div>
-    {% endfor %}
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<h2>Manage Users</h2>
+<div class="user-list">
+  {% for user in users %}
+  <div class="user-item" data-user='{{ user | tojson | safe }}'>
+    <div class="user-info">
+      <span>{{ user.username }} - {{ user.role }}</span>
+      <button class="details-btn" onclick="showUserDetails(this)">Details</button>
+    </div>
+    <div class="user-actions">
+      <form method="POST" action="{{ url_for('edit_user_role', user_id=user._id) }}" style="display:inline;">
+        <select name="role" onchange="this.form.submit()" style="margin-right: 0.5rem;">
+          <option value="user" {% if user.role == 'user' %}selected{% endif %}>User</option>
+          <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+        </select>
+      </form>
+      <form method="POST" action="{{ url_for('delete_user', user_id=user._id) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this user?');">
+        <button class="delete-btn" type="submit">Delete</button>
+      </form>
+    </div>
   </div>
-</body>
-</html>
+  {% endfor %}
+</div>
+
+<!-- User Details Modal -->
+<div id="userDetailsModal" class="modal" style="display:none;">
+  <div class="modal-content" style="max-width: 400px;">
+    <span class="close" onclick="closeUserDetails()">&times;</span>
+    <h3>User Details</h3>
+    <div id="userDetailsBody">
+      <!-- Details will be loaded here -->
+    </div>
+  </div>
+</div>
+
+<script>
+function showUserDetails(btn) {
+  const user = JSON.parse(btn.closest('.user-item').getAttribute('data-user'));
+  // Optionally, fetch more details via AJAX if needed
+  let html = `
+    <strong>Username:</strong> ${user.username}<br>
+    <strong>Role:</strong> ${user.role}<br>
+    <strong>First Name:</strong> ${user.first_name || ''}<br>
+    <strong>Last Name:</strong> ${user.last_name || ''}<br>
+    <strong>Email:</strong> ${user.email || ''}<br>
+    <strong>Gender:</strong> ${user.gender || ''}<br>
+    <strong>Birthday:</strong> ${user.birthday || ''}<br>
+    <strong>Sex:</strong> ${user.sex || ''}<br>
+    <strong>Contact Number:</strong> ${user.contactnumber || ''}<br>
+  `;
+  document.getElementById('userDetailsBody').innerHTML = html;
+  document.getElementById('userDetailsModal').style.display = 'block';
+}
+function closeUserDetails() {
+  document.getElementById('userDetailsModal').style.display = 'none';
+}
+window.onclick = function(event) {
+  const modal = document.getElementById('userDetailsModal');
+  if (event.target == modal) {
+    closeUserDetails();
+  }
+}
+</script>
+
+{% endblock %}

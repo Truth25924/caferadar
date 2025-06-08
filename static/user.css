@@ -1,0 +1,425 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+/* CafeRadar User Dashboard CSS - Grab-inspired */
+
+/* Root variables for easy color management */
+:root {
+  --primary: #00b14f;
+  --primary-dark: #008f3a;
+  --secondary: #f6fff9;
+  --gray: #e5e7eb;
+  --gray-dark: #6b7280;
+  --white: #fff;
+  --danger: #ef4444;
+  --shadow: 0 2px 8px rgba(0, 177, 79, 0.08);
+  --border-radius: 12px;
+  --transition: 0.18s cubic-bezier(.4,2,.6,1);
+  --navbar-height: 64px;
+}
+
+/* Reset and base styles */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  background: var(--secondary);
+  color: #222;
+  min-height: 100vh;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--white);
+  height: var(--navbar-height);
+  padding: 0 2rem;
+  box-shadow: 0 2px 8px rgba(0, 177, 79, 0.07);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-links li a {
+  text-decoration: none;
+  color: var(--primary-dark);
+  font-weight: 500;
+  font-size: 1.1rem;
+  transition: color var(--transition);
+}
+
+.navbar-links li a:hover {
+  color: var(--primary);
+}
+
+.navbar-profile-group {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.navbar-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  cursor: pointer;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  transition: background var(--transition);
+}
+
+.navbar-profile:hover {
+  background: var(--secondary);
+}
+
+.profile-pic {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary);
+  background: var(--gray);
+}
+
+.logout-btn {
+  color: var(--danger);
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color var(--transition);
+  padding: 0 0.5rem;
+  text-decoration: none;
+}
+
+.logout-btn:hover {
+  color: #b91c1c;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+  max-width: 1200px;
+  margin: 2.5rem auto 0 auto;
+  padding: 0 1.5rem 2rem 1.5rem;
+}
+
+/* Section Titles */
+section h2 {
+  color: var(--primary-dark);
+  margin-bottom: 1.2rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+/* Cafe List */
+.cafe-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.cafe-card {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow var(--transition), transform var(--transition);
+  border: 1.5px solid var(--gray);
+  position: relative;
+}
+
+.cafe-card.recommended {
+  border: 2.5px solid var(--primary);
+  box-shadow: 0 4px 16px rgba(0, 177, 79, 0.13);
+}
+
+.cafe-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background: var(--gray);
+}
+
+.cafe-info {
+  padding: 1.2rem 1.2rem 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.cafe-info h3 {
+  margin: 0 0 0.3rem 0;
+  color: var(--primary-dark);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.cafe-info p {
+  margin: 0 0 0.5rem 0;
+  color: #444;
+  font-size: 1rem;
+}
+
+.cafe-location {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: color var(--transition);
+}
+
+.cafe-location:hover {
+  color: var(--primary-dark);
+}
+
+.cafe-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.rating-number {
+  margin-left: 0.6rem;
+  color: var(--gray-dark);
+  font-size: 0.98rem;
+}
+
+.rate-form, .comment-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.rate-form select, .comment-form input[type="text"] {
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid var(--gray);
+  font-size: 1rem;
+}
+
+.rate-form button, .comment-form button {
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 6px;
+  padding: 0.3rem 1.1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.rate-form button:hover, .comment-form button:hover {
+  background: var(--primary-dark);
+}
+
+.cafe-comments {
+  margin-top: 0.5rem;
+  font-size: 0.98rem;
+  color: #333;
+}
+
+.cafe-comments ul {
+  margin: 0.3rem 0 0 1.2rem;
+  padding: 0;
+  list-style: disc;
+}
+
+.cafe-comments li {
+  margin-bottom: 0.2rem;
+}
+
+/* Profile Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  overflow: auto;
+  background: rgba(0,0,0,0.25);
+}
+
+.modal-content {
+  background: var(--white);
+  margin: 5% auto;
+  padding: 2.2rem 2rem 2rem 2rem;
+  border-radius: 16px;
+  width: 95%;
+  max-width: 420px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 177, 79, 0.13);
+  animation: modalIn 0.25s cubic-bezier(.4,2,.6,1);
+}
+
+@keyframes modalIn {
+  from { transform: translateY(-40px) scale(0.97); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.close {
+  position: absolute;
+  right: 1.2rem;
+  top: 1.2rem;
+  font-size: 1.5rem;
+  color: #888;
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.close:hover {
+  color: var(--primary-dark);
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.profile-pic-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.profile-pic-large {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2.5px solid var(--primary);
+  background: var(--gray);
+}
+
+.profile-fields label {
+  display: flex;
+  flex-direction: column;
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.profile-fields input[type="text"],
+.profile-fields input[type="email"],
+.profile-fields input[type="date"] {
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid var(--gray);
+  font-size: 1rem;
+  margin-top: 0.2rem;
+}
+
+.save-btn {
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.3rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition);
+  margin-top: 0.7rem;
+}
+
+.save-btn:hover {
+  background: var(--primary-dark);
+}
+
+/* Responsive Design */
+@media (max-width: 1000px) {
+  .dashboard-container {
+    max-width: 98vw;
+    padding: 0 0.5rem 2rem 0.5rem;
+  }
+  .cafe-list {
+    gap: 1.2rem;
+  }
+  .cafe-card {
+    width: 95vw;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 700px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    height: auto;
+    padding: 0.7rem 1rem;
+    gap: 0.7rem;
+  }
+  .navbar-links {
+    gap: 1.2rem;
+  }
+  .dashboard-container {
+    margin-top: 1.2rem;
+    padding: 0 0.2rem 1.5rem 0.2rem;
+  }
+  .cafe-list {
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: center;
+  }
+  .cafe-card {
+    width: 98vw;
+    max-width: 98vw;
+  }
+  .modal-content {
+    padding: 1.2rem 0.7rem 1.2rem 0.7rem;
+    max-width: 98vw;
+  }
+}
+
+/* Scrollbar styling for a modern look */
+body, .modal-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--gray);
+}
+body::-webkit-scrollbar, .modal-content::-webkit-scrollbar {
+  width: 8px;
+  background: var(--gray);
+}
+body::-webkit-scrollbar-thumb, .modal-content::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 8px;
+}
+
+/* Utility classes */
+.text-center { text-align: center; }
+.mt-2 { margin-top: 2rem; }
+.mb-2 { margin-bottom: 2rem; }

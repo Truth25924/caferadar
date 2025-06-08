@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='admin.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container">
+      <nav class="navigation">
+        <div class="logo">CafeRadar</div>
+        <ul>
+          <li class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+            <a href="{{ url_for('dashboard') }}">
+              <span class="icon"><i class="fa-solid fa-gauge"></i></span>
+              <span class="title">Dashboard</span>
+            </a>
+          </li>
+          <!--<li
+            class="{% if request.endpoint in ['add_cafe', 'edit_cafe', 'delete_cafe'] %}active{% endif %}"
+          >
+            <a href="{{ url_for('dashboard') }}#cafes">
+              <span class="icon"><i class="fa-solid fa-mug-hot"></i></span>
+              <span class="title">Cafes</span>
+            </a>
+          </li>-->
+          <li
+            class="{% if request.endpoint == 'admin_users' %}active{% endif %}"
+          >
+            <a href="{{ url_for('admin_users') }}">
+              <span class="icon"><i class="fa-solid fa-users"></i></span>
+              <span class="title">Users</span>
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('logout') }}">
+              <span class="icon"
+                ><i class="fa-solid fa-right-from-bracket"></i
+              ></span>
+              <span class="title">Logout</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="main">
+        <div class="top-bar">
+          <div class="toggle" onclick="toggleNav()">
+            <i class="fa-solid fa-bars"></i>
+          </div>
+        </div>
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+    <footer>
+      &copy; {{ current_year if current_year else 2024 }} CafeRadar Admin Panel
+    </footer>
+
+    <script>
+      // Sidebar toggle for responsiveness
+      function toggleNav() {
+        document.querySelector(".navigation").classList.toggle("minimized");
+        document.querySelector(".main").classList.toggle("nav-minimized");
+      }
+    </script>
+  </body>
+</html>

@@ -1,3 +1,173 @@
-<h2>Welcome, {{ username }}!</h2>
-<p>This is the user dashboard.</p>
-<a href="/profile">Profile</a> | <a href="/logout">Logout</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CafeRadar - User Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='user.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+    <div class="navbar-logo">
+        <i class="fa-solid fa-mug-hot"></i> CafeRadar
+    </div>
+    <ul class="navbar-links">
+        <li><a href="#cafes">Cafes</a></li>
+        <li><a href="#recommended">Recommended</a></li>
+    </ul>
+    <div class="navbar-profile-group">
+        <div class="navbar-profile" onclick="openProfileModal()">
+            <img src="{{ user.profile_pic_url if user.profile_pic_url else url_for('static', filename='default_profile.png') }}" alt="Profile Picture" class="profile-pic">
+            <span>{{ user.username|capitalize }}</span>
+        </div>
+        <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </a>
+    </div>
+</nav>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <section id="cafes">
+            <h2>All Cafes</h2>
+            <div class="cafe-list">
+                {% for cafe in cafes %}
+                <div class="cafe-card">
+                    <img src="{{ cafe.image_url or url_for('static', filename='default_cafe.jpg') }}" alt="{{ cafe.name }} image" class="cafe-img">
+                    <div class="cafe-info">
+                        <h3>{{ cafe.name }}</h3>
+                        <p>{{ cafe.description }}</p>
+                        <a href="{{ cafe.maps_url }}" target="_blank" class="cafe-location">
+                            <i class="fa-solid fa-location-dot"></i> View on Maps
+                        </a>
+                        {% set ratings = cafe.ratings if cafe.ratings else [] %}
+                        {% set rating_sum = ratings | map(attribute='rating') | sum %}
+                        {% set rating_count = ratings | length %}
+                        {% set rating = (rating_sum / rating_count) if rating_count else 0 %}
+                        <div class="cafe-rating">
+                            {% for i in range(1, 6) %}
+                                {% if i <= rating %}
+                                    <i class="fa-solid fa-star" style="color: #ffd700"></i>
+                                {% else %}
+                                    <i class="fa-regular fa-star" style="color: #ffd700"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="rating-number">
+                                {{ "%.1f"|format(rating) }} / 5 ({{ rating_count }})
+                            </span>
+                        </div>
+                        <form method="POST" action="{{ url_for('rate_cafe', cafe_id=cafe._id) }}" class="rate-form">
+                            <label>Rate:
+                                <select name="rating" required>
+                                    <option value="">--</option>
+                                    {% for i in range(1, 6) %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
+                            <button type="submit">Submit</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('comment_cafe', cafe_id=cafe._id) }}" class="comment-form">
+                            <input type="text" name="comment" placeholder="Leave a comment..." required>
+                            <button type="submit">Comment</button>
+                        </form>
+                        <div class="cafe-comments">
+                            <strong>Comments:</strong>
+                            {% if cafe.comments %}
+                            <ul>
+                                {% for comment in cafe.comments %}
+                                <li>{{ comment }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <em>No comments yet.</em>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section id="recommended">
+            <h2>Recommended Cafes</h2>
+            <div class="cafe-list">
+                {% for cafe in cafes if cafe.is_recommended %}
+                <div class="cafe-card recommended">
+                    <img src="{{ cafe.image_url or url_for('static', filename='default_cafe.jpg') }}" alt="{{ cafe.name }} image" class="cafe-img">
+                    <div class="cafe-info">
+                        <h3>{{ cafe.name }}</h3>
+                        <p>{{ cafe.description }}</p>
+                        <a href="{{ cafe.maps_url }}" target="_blank" class="cafe-location">
+                            <i class="fa-solid fa-location-dot"></i> View on Maps
+                        </a>
+                        {% set ratings = cafe.ratings if cafe.ratings else [] %}
+                        {% set rating_sum = ratings | map(attribute='rating') | sum %}
+                        {% set rating_count = ratings | length %}
+                        {% set rating = (rating_sum / rating_count) if rating_count else 0 %}
+                        <div class="cafe-rating">
+                            {% for i in range(1, 6) %}
+                                {% if i <= rating %}
+                                    <i class="fa-solid fa-star" style="color: #ffd700"></i>
+                                {% else %}
+                                    <i class="fa-regular fa-star" style="color: #ffd700"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="rating-number">
+                                {{ "%.1f"|format(rating) }} / 5 ({{ rating_count }})
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p>No recommended cafes yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeProfileModal()">&times;</span>
+            <h2>Profile Details</h2>
+            <form method="POST" action="{{ url_for('edit_profile') }}" enctype="multipart/form-data" class="profile-form">
+                <div class="profile-pic-section">
+                    <img src="{{ user.profile_pic_url if user.profile_pic_url else url_for('static', filename='default_profile.png') }}" alt="Profile Picture" class="profile-pic-large">
+                    <input type="file" name="profile_pic" accept="image/*">
+                </div>
+                <div class="profile-fields">
+                    <label>Username: <input type="text" name="username" value="{{ user.username }}" readonly></label>
+                    <label>First Name: <input type="text" name="first_name" value="{{ user.first_name }}"></label>
+                    <label>Last Name: <input type="text" name="last_name" value="{{ user.last_name }}"></label>
+                    <label>Email: <input type="email" name="email" value="{{ user.email }}"></label>
+                    <label>Gender: <input type="text" name="gender" value="{{ user.gender }}"></label>
+                    <label>Birthday: <input type="date" name="birthday" value="{{ user.birthday }}"></label>
+                    <label>Sex: <input type="text" name="sex" value="{{ user.sex }}"></label>
+                    <label>Contact Number: <input type="text" name="contactnumber" value="{{ user.contactnumber }}"></label>
+                </div>
+                <button type="submit" class="save-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openProfileModal() {
+            document.getElementById('profileModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeProfileModal() {
+            document.getElementById('profileModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        window.onclick = function(event) {
+            const modal = document.getElementById('profileModal');
+            if (event.target == modal) {
+                closeProfileModal();
+            }
+        }
+    </script>
+</body>
+</html>
