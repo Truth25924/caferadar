@@ -48,8 +48,13 @@
                 <div class="cafe-card">
                     <img src="{{ cafe.image_url or url_for('static', filename='default_cafe.jpg') }}" alt="{{ cafe.name }} image" class="cafe-img">
                     <div class="cafe-info">
-                        <h3>{{ cafe.name }}</h3>
-                        <p>{{ cafe.description }}</p>
+                        <div class="cafe-card-header">
+                            <h3>{{ cafe.name }}</h3>
+                            <button class="cafe-options-btn" title="View Details" onclick="openCafeModal({{ loop.index0 }})">
+                                <i class="fa-solid fa-ellipsis"></i>
+                            </button>
+                        </div>
+                        <p class="cafe-Desc">{{ cafe.description }}</p>
                         <a href="{{ cafe.maps_url }}" target="_blank" class="cafe-location">
                             <i class="fa-solid fa-location-dot"></i> View on Maps
                         </a>
@@ -71,7 +76,6 @@
                         </div>
 
                         <!-- Latest Comment Preview -->
-                         
                         <div class="cafe-comments cafe-comments-previews">
                             {% if cafe.comments and cafe.comments|length > 0 %}
                                 {% set latest = cafe.comments[-1] %}
@@ -107,10 +111,6 @@
                             <input type="text" name="comment" placeholder="Leave a comment..." required>
                             <button type="submit">Submit</button>
                         </form>
-                        <!-- View Details Button -->
-                        <button type="button" class="view-details-btn" onclick="openCafeModal({{ loop.index0 }})">
-                            <i class="fa-solid fa-magnifying-glass"></i> View Details
-                        </button>
                     </div>
                 </div>
                 {% endfor %}
@@ -181,6 +181,70 @@
             </div>
         </div>
     </div>
+<div id="profileModal" style="display:none; position:fixed; z-index:1002; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5);">
+  <div class="profile-form" style="position:relative; max-width:400px; margin:5vh auto; top:5vh;">
+    <span class="close profile-modal-close" onclick="closeProfileModal()" style="position:absolute; top:1.2rem; right:1.2rem; font-size:1.5rem; color:#888; cursor:pointer;">&times;</span>
+    <div class="profile-pic-section">
+      <img src="{{ user.profile_pic_url if user.profile_pic_url else url_for('static', filename='default_profile.png') }}" alt="Profile Picture" class="profile-pic-large">
+      <h2 style="margin:0.5em 0 0.2em 0;">{{ user.username|capitalize }}</h2>
+      <p style="color:#555; margin-bottom:0.5em;">Email: {{ user.email }}</p>
+      <!-- Add more user info here if desired -->
+      <button class="save-btn" type="button" onclick="openEditProfileModal()">Edit Profile</button>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Edit Modal (Form) -->
+
+<div id="editProfileModal" style="display:none; position:fixed; z-index:1003; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5);">
+    <form class="profile-form" method="POST" action="{{ url_for('edit_profile') }}" enctype="multipart/form-data" style="position:relative; max-width:400px; margin:5vh auto; top:5vh;">
+        <span class="close profile-modal-close" onclick="closeEditProfileModal()" style="position:absolute; top:1.2rem; right:1.2rem; font-size:1.5rem; color:#888; cursor:pointer;">&times;</span>
+        <div class="profile-pic-section" style="position:relative; display:flex; flex-direction:column; align-items:center;">
+
+        <!-- Profile Picture with Camera Icon Overlay -->
+
+        <div class="profile-pic-upload-wrapper">
+            <img id="editProfilePicPreview" src="{{ user.profile_pic_url if user.profile_pic_url else url_for('static', filename='default_profile.png') }}" alt="Profile Picture" class="profile-pic-large">
+            <label for="profilePicInput" class="camera-icon-label" title="Change profile picture">
+            <i class="fa-solid fa-camera"></i>
+            </label>
+            <input id="profilePicInput" type="file" name="profile_pic" accept="image/*" onchange="previewProfilePic(event)" style="display:none;">
+        </div>
+        </div>
+        <div class="profile-fields">
+        <label>
+            First Name
+            <input type="text" name="first_name" value="{{ user.first_name }}" required>
+        </label>
+        <label>
+            Last Name
+            <input type="text" name="last_name" value="{{ user.last_name }}" required>
+        </label>
+        <label>
+            Email
+            <input type="email" name="email" value="{{ user.email }}" required>
+        </label>
+        <label>
+            Gender
+            <select name="gender" required>
+            <option value="">Select</option>
+            <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
+            <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+            <option value="Other" {% if user.gender == 'Other' %}selected{% endif %}>Other</option>
+            </select>
+        </label>
+        <label>
+            Birthday
+            <input type="date" name="birthday" value="{{ user.birthday }}">
+        </label>
+        <label>
+            Contact Number
+            <input type="text" name="contactnumber" value="{{ user.contactnumber }}">
+        </label>
+        </div>
+        <button class="save-btn" type="submit">Save Changes</button>
+    </form>
+</div>
 
     <script>
     const currentUsername = "{{ user.username|e }}";
@@ -263,6 +327,31 @@
             document.getElementById('cafeModal').style.display = 'block';
             document.body.style.overflow = 'hidden';
         }
+        function openProfileModal() {
+            document.getElementById('profileModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeProfileModal() {
+            document.getElementById('profileModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        function openEditProfileModal() {
+            document.getElementById('profileModal').style.display = 'none';
+            document.getElementById('editProfileModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeEditProfileModal() {
+            document.getElementById('editProfileModal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        // Preview profile picture before upload
+        function previewProfilePic(event) {
+            const [file] = event.target.files;
+            if (file) {
+                document.getElementById('editProfilePicPreview').src = URL.createObjectURL(file);
+            }
+        }
+
         function closeCafeModal() {
             document.getElementById('cafeModal').style.display = 'none';
             document.body.style.overflow = '';

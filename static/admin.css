@@ -513,7 +513,6 @@ footer {
 
 /* ----- MODAL STYLES FOR WHEN CLICKING THE CAFE TO ENLARGE DETAILS DO NOT CHANGE ----- */
 /* --- Cafe Modal (Synchronized with User Dashboard) --- */
-/* --- Synchronized Admin Modal Styles --- */
 .cafe-modal {
   display: none;
   position: fixed;
@@ -535,12 +534,14 @@ footer {
   to { background: rgba(0, 0, 0, 0.45); }
 }
 .cafe-modal-content {
-  background: #fff;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
   margin: 4vh auto;
   border-radius: 16px;
   max-width: 700px;
   width: 95vw;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  height: 100vh;
+  max-height: 90%;
   animation: zoomIn 0.25s;
   position: relative;
   padding: 0;
@@ -578,8 +579,7 @@ footer {
 }
 .cafe-modal-address {
   margin-top: 0.7em;
-  color: #444;
-  font-size: 1.05em;
+  font-size: 0.9rem;
   display: flex;
   align-items: flex-start;
   gap: 0.5em;
@@ -591,7 +591,6 @@ footer {
   overflow-wrap: break-word;
   white-space: normal;
   box-sizing: border-box;
-  background: #e5e7eb;
   border-radius: 7px;
   padding: 0.5em 0.9em;
   font-weight: 500;
@@ -631,21 +630,21 @@ footer {
   margin: 0.5rem 0 0.2rem 0;
 }
 .cafe-modal-details .cafe-comments {
-  background: #f6fff9;
   border-radius: 10px;
   padding: 1.1em 1.3em;
-  margin-top: 1.2em;
-  margin-bottom: 1.2em;
+  top: 30rem;
+  left: 2.5rem;
+  position: absolute;
   min-height: 12em;
-  max-height: 28em;
-  box-shadow: 0 1px 6px rgba(0, 177, 79, 0.07);
+  max-height: 35%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  width: 88%;
 }
 .cafe-modal-details .cafe-comments > strong {
   margin-bottom: 0.7em;
-  color: #2563eb;
   font-size: 1.08em;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -665,18 +664,9 @@ footer {
   scrollbar-width: thin;
   scrollbar-color: #2563eb #e5e7eb;
 }
-.cafe-modal-details .modal-comments-list::-webkit-scrollbar {
-  width: 8px;
-  background: #e5e7eb;
-}
-.cafe-modal-details .modal-comments-list::-webkit-scrollbar-thumb {
-  background: #2563eb;
-  border-radius: 8px;
-}
+
 .cafe-modal-details .modal-comments-list li {
-  background: #fff;
   border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 177, 79, 0.07);
   padding: 1em 1.2em 0.9em 1.2em;
   display: flex;
   flex-direction: column;
@@ -950,8 +940,6 @@ footer {
   color: #2563eb;
   border-color: #2563eb;
 }
-
-/* CSS FOR ADMIN_USER.HTML STYLES ONLY FOR ADMIN */
 
 /* --- User List Styles for Admin Panel --- */
 .user-list {
