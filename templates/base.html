@@ -23,6 +23,8 @@
   </head>
   <body>
     <div class="container">
+      {% if session.get('username') %}
+      <!-- Existing sidebar navigation -->
       <nav class="navigation">
         <div class="logo">CafeRadar</div>
         <ul>
@@ -58,6 +60,9 @@
           </li>
         </ul>
       </nav>
+      {% endif %}
+
+
       <div class="main">
         <div class="top-bar">
           <div class="toggle" onclick="toggleNav()">
@@ -77,6 +82,77 @@
         document.querySelector(".navigation").classList.toggle("minimized");
         document.querySelector(".main").classList.toggle("nav-minimized");
       }
+
+      // Toggle menu dropdown
+      document.addEventListener('DOMContentLoaded', function() {
+        const menuToggleBtn = document.getElementById('menu-toggle-btn');
+        const menuDropdown = document.getElementById('menu-dropdown');
+
+        menuToggleBtn.addEventListener('click', function() {
+          if (menuDropdown.style.display === 'none') {
+            menuDropdown.style.display = 'block';
+          } else {
+            menuDropdown.style.display = 'none';
+          }
+        });
+      });
     </script>
-  </body>
-</html>
+
+    <style>
+      /* Styles for the new top navbar */
+      .top-navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #333;
+        padding: 10px 20px;
+        color: white;
+      }
+      .top-navbar .nav-left input[type="text"] {
+        padding: 5px 10px;
+        font-size: 16px;
+        border-radius: 4px;
+        border: none;
+        width: 200px;
+      }
+      .top-navbar .nav-left button {
+        margin-left: 10px;
+        padding: 6px 12px;
+        font-size: 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .top-navbar .nav-right {
+        position: relative;
+      }
+      .top-navbar .menu-toggle {
+        cursor: pointer;
+        font-size: 20px;
+      }
+      .top-navbar .menu-dropdown {
+        position: absolute;
+        right: 0;
+        top: 30px;
+        background-color: white;
+        color: black;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        display: none;
+        flex-direction: column;
+        min-width: 120px;
+        z-index: 1000;
+      }
+      .top-navbar .menu-dropdown a {
+        padding: 10px 15px;
+        text-decoration: none;
+        color: black;
+        border-bottom: 1px solid #ddd;
+      }
+      .top-navbar .menu-dropdown a:last-child {
+        border-bottom: none;
+      }
+      .top-navbar .menu-dropdown a:hover {
+        background-color: #f0f0f0;
+      }
+    </style>

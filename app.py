@@ -55,7 +55,9 @@ def add_cache_control(response):
 def home():
     if 'username' in session:
         return redirect('/dashboard')
-    return redirect('/login')
+    cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
+    cafes = normalize_cafe_ratings_comments(cafes)
+    return render_template('home.html', cafes=cafes)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -243,7 +245,7 @@ def user_details(user_id):
 @login_required
 def logout():
     session.clear()
-    return redirect('/login')
+    return redirect(url_for('home'))
 
 # ----------- Cafe Admin Features -----------
 

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Home</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url("{{ url_for('static', filename='uploads/homepic.jpg') }}");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      color: white;
+    }
+    .top-navbar {
+      display: flex;
+      justify-content: flex-end;
+      background-color: rgba(51, 51, 51, 0.8);
+      padding: 10px 20px;
+      color: white;
+      position: relative;
+    }
+    .top-navbar button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 16px;
+      margin-left: 20px;
+      cursor: pointer;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.5);
+      display: none;
+      z-index: 999;
+    }
+    .card-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      max-height: 80vh;
+      overflow-y: auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      display: none;
+      z-index: 1000;
+      color: black;
+    }
+    #sign-in-card {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    #sign-up-card {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    .card-container h2 {
+      margin-top: 0;
+    }
+    .card-container form {
+      display: flex;
+      flex-direction: column;
+    }
+    .card-container label {
+      margin: 10px 0 5px;
+    }
+    .card-container input[type="text"],
+    .card-container input[type="password"],
+    .card-container input[type="email"],
+    .card-container input[type="date"],
+    .card-container select {
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .card-container button.submit-btn {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .cafe-list {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background-color: rgba(0,0,0,0.5);
+      border-radius: 8px;
+    }
+    .cafe-list ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .cafe-list li {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      background: white;
+      color: black;
+    }
+    .homepage-text {
+      text-align: center;
+      margin-top: 100px;
+      font-size: 2em;
+      font-weight: bold;
+      text-shadow: 4px 4px 8px rgba(0,0,0,0.7);
+    }
+    .show-more-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      text-shadow: none;
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-navbar">
+    <button id="sign-in-btn">Sign In</button>
+    <button id="sign-up-btn">Sign Up</button>
+  </nav>
+
+  <div class="card-container" id="sign-in-card">
+    <h2>Sign In</h2>
+    <form method="POST" action="/login">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required />
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
+      <button type="submit" class="submit-btn">Login</button>
+    </form>
+  </div>
+
+  <div class="card-container" id="sign-up-card">
+    <h2>Sign Up</h2>
+    <form method="POST" action="/register">
+      <label for="reg-username">Username</label>
+      <input type="text" id="reg-username" name="username" required />
+      <label for="reg-password">Password</label>
+      <input type="password" id="reg-password" name="password" required />
+      <label for="first_name">First Name</label>
+      <input type="text" id="first_name" name="first_name" required />
+      <label for="last_name">Last Name</label>
+      <input type="text" id="last_name" name="last_name" required />
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required />
+      <label for="gender">Gender</label>
+      <select id="gender" name="gender" required>
+        <option value="">Select</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+      <label for="birthday">Birthday</label>
+      <input type="date" id="birthday" name="birthday" required />
+      <button type="submit" class="submit-btn">Register</button>
+    </form>
+  </div>
+
+  <div class="homepage-text">
+    Find your coffee with just a click
+  </div>
+  <button class="show-more-btn" id="show-more-btn">Show More</button>
+
+  <div class="cafe-list" id="cafe-list" style="display:none;">
+    <h1>Cafe Recommendations</h1>
+    {% if cafes %}
+      <ul>
+        {% for cafe in cafes %}
+          <li>
+            <h3>{{ cafe.name }}</h3>
+            <p>{{ cafe.description }}</p>
+            <p><strong>Location:</strong> {{ cafe.location }}</p>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No cafe recommendations available.</p>
+    {% endif %}
+  </div>
+
+  <script>
+    const signInBtn = document.getElementById('sign-in-btn');
+    const signUpBtn = document.getElementById('sign-up-btn');
+    const signInCard = document.getElementById('sign-in-card');
+    const signUpCard = document.getElementById('sign-up-card');
+    const showMoreBtn = document.getElementById('show-more-btn');
+    const cafeList = document.getElementById('cafe-list');
+
+    // Create overlay div
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    document.body.appendChild(overlay);
+
+    function showCard(card) {
+      card.style.display = 'block';
+      overlay.style.display = 'block';
+    }
+
+    function hideCards() {
+      signInCard.style.display = 'none';
+      signUpCard.style.display = 'none';
+      overlay.style.display = 'none';
+    }
+
+    signInBtn.addEventListener('click', () => {
+      if (signInCard.style.display === 'block') {
+        hideCards();
+      } else {
+        showCard(signInCard);
+        signUpCard.style.display = 'none';
+      }
+    });
+
+    signUpBtn.addEventListener('click', () => {
+      if (signUpCard.style.display === 'block') {
+        hideCards();
+      } else {
+        showCard(signUpCard);
+        signInCard.style.display = 'none';
+      }
+    });
+
+    showMoreBtn.addEventListener('click', () => {
+      cafeList.style.display = 'block';
+      showCard(signUpCard);
+      signInCard.style.display = 'none';
+    });
+
+    // Hide cards when clicking on overlay
+    overlay.addEventListener('click', () => {
+      hideCards();
+    });
+  </script>
+</body>
+</html>
