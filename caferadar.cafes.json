@@ -1,0 +1,132 @@
+[{
+  "_id": {
+    "$oid": "68454ffa6f0535890bc63c99"
+  },
+  "name": "Cafe B.O.M",
+  "description": "Cafe BOM is the BEST Korean-Concept Cafe in Pampanga. Studio Cafe that offers photoshoot for everyone",
+  "maps_url": "https://maps.app.goo.gl/Ct61m6FK8ARkvatU7",
+  "image_url": "/static/uploads/cafebom.jpg",
+  "ratings": [
+    {
+      "user": "user",
+      "rating": 3,
+      "timestamp": "2025-06-11T16:31:10.007882"
+    }
+  ],
+  "comments": [
+    {
+      "user": "user",
+      "comment": "sarap ng kape",
+      "timestamp": "2025-06-08T08:55:55.143656"
+    }
+  ],
+  "address": "Lot 18-1B, E. Jacinto St., Clark, Philippines"
+},
+{
+  "_id": {
+    "$oid": "6849bae6989a6afe32cb3cb3"
+  },
+  "name": "Long Weekend",
+  "description": "Great coffee, even better vibes. ☕️✨\r\nStay awhile and enjoy the moment! 🌞",
+  "maps_url": "https://maps.app.goo.gl/CQ3LahKgGTiUQNr18",
+  "address": "5HVJ+WP4, Mabalacat City, Pampanga",
+  "image_url": "/static/uploads/longweekend.png",
+  "ratings": [],
+  "comments": []
+},
+{
+  "_id": {
+    "$oid": "6849bb10989a6afe32cb3cb4"
+  },
+  "name": "Porch Coffee",
+  "description": "Life is a picnic 🧺🌱🪴🌿🌳🏡\r\nOpen daily: 7am-10pm 🗓️☕️🍽️🍳",
+  "maps_url": "https://maps.app.goo.gl/bbQS1aGdwasVsCKr9",
+  "address": "2088 R. C. Santos, Clark Freeport, Clark Special Economic Zone, 2010 Pampanga",
+  "image_url": "/static/uploads/PorchCoffee.png",
+  "ratings": [],
+  "comments": []
+},
+{
+  "_id": {
+    "$oid": "6849bb1c989a6afe32cb3cb5"
+  },
+  "name": "Bap's Coffee",
+  "description": "☕️ Neighborhood coffee\r\n🕙 Mabalacat - Mon 10am-10pm | Sun 1pm-10pm",
+  "maps_url": "https://maps.app.goo.gl/fDy2Jh3CXB6R4Fpx8",
+  "address": "234 Sta. Ines Interchange, Mabalacat City, Pampanga",
+  "image_url": "/static/uploads/Baps_Coffee.png",
+  "ratings": [],
+  "comments": []
+},
+{
+  "_id": {
+    "$oid": "6849bda4989a6afe32cb3cb6"
+  },
+  "name": "Potter's Coffee",
+  "description": "test",
+  "maps_url": "https://maps.app.goo.gl/BUJTEstevZR87k9L9",
+  "address": "5GXC+QR, Mabalacat City, Pampanga",
+  "image_url": "/static/uploads/Potters_Coffee.png",
+  "ratings": [],
+  "comments": []
+},
+{
+  "_id": {
+    "$oid": "6849bdaf989a6afe32cb3cb7"
+  },
+  "name": "Silung",
+  "description": "test",
+  "maps_url": "https://maps.app.goo.gl/D9sUp5moaxQwKC2L6",
+  "address": "MacArthur Hwy, Mabalacat City, Pampanga",
+  "image_url": "/static/uploads/Silung.png",
+  "ratings": [],
+  "comments": []
+},
+{
+  "_id": {
+    "$oid": "6849bdc0989a6afe32cb3cb8"
+  },
+  "name": "Coffee Connoisseur",
+  "description": "test",
+  "maps_url": "https://maps.app.goo.gl/A1AQVUzhyhmsxLo7A",
+  "address": "testadd",
+  "image_url": "/static/uploads/CoffeeConnoisseur.png",
+  "ratings": [],
+  "comments": []
+},
+{
+  "_id": {
+    "$oid": "6849bdd0989a6afe32cb3cb9"
+  },
+  "name": "Cafe Beni",
+  "description": "test",
+  "maps_url": "https://maps.app.goo.gl/sZBwNmwzMJeHZuzRA",
+  "address": "5HRM+C6J, MacArthur Hwy, Mabalacat City, Pampanga",
+  "image_url": "/static/uploads/Cafe_Beni.png",
+  "ratings": [],
+  "comments": []
+},
+{
+  "_id": {
+    "$oid": "6849bde5989a6afe32cb3cba"
+  },
+  "name": "The Bean Factory",
+  "description": "test",
+  "maps_url": "https://maps.app.goo.gl/Mc6cpMScgHDT2XXy6",
+  "address": "2010 2, 2010 MacArthur Hwy, Mabalacat City, Pampanga",
+  "image_url": "/static/uploads/The_Bean_Factory.png",
+  "ratings": [],
+  "comments": []
+},
+{
+  "_id": {
+    "$oid": "6849bdfe989a6afe32cb3cbb"
+  },
+  "name": "Bloom and Brew",
+  "description": "test",
+  "maps_url": "https://maps.app.goo.gl/gzf5oq7soGcUzgFF6",
+  "address": "Clark, Claro M. Recto Highway Air Force City Park, Andres Bonifacio Avenue, Clark Freeport, Mabalacat City, 2010 Pampanga",
+  "image_url": "/static/uploads/Bloom_and_Brew.png",
+  "ratings": [],
+  "comments": []
+}]
