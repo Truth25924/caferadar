@@ -73,8 +73,13 @@ def register():
         birthday = request.form['birthday']
         contactnumber = request.form.get('contactnumber', None)  # Optional
 
+        from flask import flash
+
         if users_col.find_one({'username': username}):
-            return "Username already exists!"
+            flash("Username already exists!", "error")
+            cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
+            cafes = normalize_cafe_ratings_comments(cafes)
+            return render_template('home.html', show_sign_up=True, cafes=cafes)
 
         hashed_password = generate_password_hash(password)
 
@@ -99,8 +104,13 @@ def register():
             user_data['contactnumber'] = contactnumber
 
         users_col.insert_one(user_data)
-        return redirect('/login')
-    return render_template('register.html')
+        flash("Account Created Successfully.", "success")
+        cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
+        cafes = normalize_cafe_ratings_comments(cafes)
+        return render_template('home.html', show_sign_up=True, cafes=cafes)
+    cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
+    cafes = normalize_cafe_ratings_comments(cafes)
+    return render_template('home.html', cafes=cafes)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -114,8 +124,13 @@ def login():
             session['username'] = user['username']
             session['role'] = user['role']
             return redirect('/dashboard')
-        return "Invalid credentials."
-    return render_template('login.html')
+        
+        flash("Invalid username or password.", "error")
+        cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
+        cafes = normalize_cafe_ratings_comments(cafes)
+        return render_template('home.html', show_sign_in=True, cafes=cafes)
+    return render_template('home.html', cafes=[serialize_cafe(cafe) for cafe in cafes_col.find()])
+
 @app.route('/dashboard')
 @login_required
 def dashboard():

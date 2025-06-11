@@ -44,7 +44,7 @@
 
 <!-- Add Cafe Form with Image Upload -->
 <div class="add-cafe-form">
-  <h3>Add New Cafe Recommendation</h3>
+  <h3>Add New Cafe</h3>
   <form
     method="POST"
     action="{{ url_for('add_cafe') }}"
@@ -142,9 +142,9 @@
           </button>
         </form>
         <button
-          class="btn-approve"
-          onclick="window.location.href='{{ url_for('edit_cafe', cafe_id=cafe._id|string) }}';">
-          <i class="fa-solid fa-pen-to-square"></i>
+        class="btn-approve"
+        onclick="window.location.href='{{ url_for('edit_cafe', cafe_id=cafe._id) }}';">
+        <i class="fa-solid fa-pen-to-square"></i>
         </button>
       </div>
     </div>

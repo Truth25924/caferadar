@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-image: url("{{ url_for('static', filename='uploads/homepic.jpg') }}");
+      background: linear-gradient(rgba(0,0,0,0.3)), url("{{ url_for('static', filename='uploads/homepic.jpg') }}");
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -18,19 +18,29 @@
     }
     .top-navbar {
       display: flex;
+      justify-content: flex-start;
+      background-color: rgba(46, 45, 45, 0.6);
+      padding: 10px 40px;
+      color: white;
+      position: relative;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    .top-navbarbtn {
+      display: flex;
       justify-content: flex-end;
-      background-color: rgba(51, 51, 51, 0.8);
-      padding: 10px 20px;
+      top: -60px;
+      padding: 0px 50px;
       color: white;
       position: relative;
     }
-    .top-navbar button {
+    .top-navbarbtn button {
       background: none;
       border: none;
       color: white;
       font-size: 16px;
       margin-left: 20px;
       cursor: pointer;
+      font-family: 'Courier New', Courier, monospace;
     }
     .overlay {
       position: fixed;
@@ -50,7 +60,7 @@
       width: 300px;
       max-height: 80vh;
       overflow-y: auto;
-      background: white;
+      background: linear-gradient(to bottom right, rgba(255,255,255,0.9), rgba(187, 114, 4, 0.7));
       border-radius: 8px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       padding: 20px;
@@ -59,8 +69,8 @@
       color: black;
     }
     #sign-in-card {
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
+      border-top-right-radius: 4;
+      border-bottom-right-radius: 4;
     }
     #sign-up-card {
       border-top-left-radius: 0;
@@ -115,15 +125,16 @@
       color: black;
     }
     .homepage-text {
-      text-align: center;
-      margin-top: 100px;
+      text-align: left;
+      margin-top: 150px;
+      margin-left: 100px;
       font-size: 2em;
       font-weight: bold;
       text-shadow: 4px 4px 8px rgba(0,0,0,0.7);
     }
     .show-more-btn {
       display: block;
-      margin: 20px auto;
+      margin: 40px 95px;
       padding: 10px 20px;
       font-size: 1.2em;
       background-color: #333;
@@ -134,13 +145,98 @@
       text-align: center;
       text-shadow: none;
     }
+    .alert {
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 4px;
+      color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .alert-success {
+      background-color: #4CAF50;
+    }
+    .alert-error, .alert-danger {
+      background-color: #f44336;
+    }
+    .alert-info {
+      background-color: #2196F3;
+  }
+  </style>
   </style>
 </head>
-<body>
+<body {% if show_sign_in %} data-login-error="true" {% endif %} {% if show_sign_up %} data-register-success="true" {% endif %}>
   <nav class="top-navbar">
+    <h2>CafeRadar</h2>
+  </nav>
+  <nav class="top-navbarbtn">
     <button id="sign-in-btn">Sign In</button>
     <button id="sign-up-btn">Sign Up</button>
   </nav>
+
+  <div class="card-container" id="sign-in-card">
+    <h2>Sign In</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flashes">
+          {% for category, message in messages %}
+            {% if category == 'error' %}
+              <div class="alert alert-error">
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <form method="POST" action="/login">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required />
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
+      <button type="submit" class="submit-btn">Login</button>
+    </form>
+    <p style="margin-top: 10px;">Don't have an account? <span id="show-sign-up" style="color: blue; cursor: pointer; text-decoration: underline;">Sign Up</span></p>
+  </div>
+
+  <div class="card-container" id="sign-up-card">
+    <h2>Sign Up</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flashes">
+          {% for category, message in messages %}
+            {% if category == 'success' %}
+              <div class="alert alert-success">
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <form method="POST" action="/register">
+      <label for="reg-username">Username</label>
+      <input type="text" id="reg-username" name="username" required />
+      <label for="reg-password">Password</label>
+      <input type="password" id="reg-password" name="password" required />
+      <label for="first_name">First Name</label>
+      <input type="text" id="first_name" name="first_name" required />
+      <label for="last_name">Last Name</label>
+      <input type="text" id="last_name" name="last_name" required />
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required />
+      <label for="gender">Gender</label>
+      <select id="gender" name="gender" required>
+        <option value="">Select</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+      <label for="birthday">Birthday</label>
+      <input type="date" id="birthday" name="birthday" required />
+      <button type="submit" class="submit-btn">Register</button>
+    </form>
+    <p style="margin-top: 10px;">Already have an account? <span id="show-sign-in" style="color: blue; cursor: pointer; text-decoration: underline;">Sign In</span></p>
+  </div>
 
   <div class="card-container" id="sign-in-card">
     <h2>Sign In</h2>
@@ -151,6 +247,7 @@
       <input type="password" id="password" name="password" required />
       <button type="submit" class="submit-btn">Login</button>
     </form>
+    <p style="margin-top: 10px;">Don't have an account? <span id="show-sign-up" style="color: blue; cursor: pointer; text-decoration: underline;">Sign Up</span></p>
   </div>
 
   <div class="card-container" id="sign-up-card">
@@ -177,10 +274,11 @@
       <input type="date" id="birthday" name="birthday" required />
       <button type="submit" class="submit-btn">Register</button>
     </form>
+    <p style="margin-top: 10px;">Already have an account? <span id="show-sign-in" style="color: blue; cursor: pointer; text-decoration: underline;">Sign In</span></p>
   </div>
 
   <div class="homepage-text">
-    Find your coffee with just a click
+    Find your coffee with <br> just a click with CafeRadar!
   </div>
   <button class="show-more-btn" id="show-more-btn">Show More</button>
 
@@ -252,6 +350,47 @@
     // Hide cards when clicking on overlay
     overlay.addEventListener('click', () => {
       hideCards();
+    });
+
+    // Show sign-in card and overlay if error exists
+    if (document.body.dataset.loginError === "true") {
+      window.addEventListener('DOMContentLoaded', (event) => {
+        showCard(signInCard);
+      });
+    }
+
+    // Show sign-up card and overlay if success exists
+    console.log("registerSuccess data attribute:", document.body.dataset.registerSuccess);
+    if (document.body.dataset.registerSuccess === "true") {
+      console.log("Showing sign-up card due to registration success");
+      showCard(signUpCard);
+    }
+
+    // Toggle between sign-in and sign-up cards
+    document.getElementById('show-sign-up').addEventListener('click', () => {
+      hideCards();
+      showCard(signUpCard);
+    });
+
+    document.getElementById('show-sign-in').addEventListener('click', () => {
+      hideCards();
+      showCard(signInCard);
+    });
+  </script>
+
+  <script>
+    // Auto-hide flash messages inside cards after 5 seconds
+    document.addEventListener('DOMContentLoaded', () => {
+      const flashContainers = document.querySelectorAll('.card-container .flashes');
+      flashContainers.forEach(flashContainer => {
+        setTimeout(() => {
+          flashContainer.style.transition = 'opacity 0.5s ease';
+          flashContainer.style.opacity = '0';
+          setTimeout(() => {
+            flashContainer.remove();
+          }, 500);
+        }, 5000);
+      });
     });
   </script>
 </body>

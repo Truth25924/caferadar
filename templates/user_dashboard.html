@@ -10,9 +10,6 @@
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar">
-        <div class="navbar-logo">
-            <i class="fa-solid fa-mug-hot"></i> CafeRadar
-        </div>
         <ul class="navbar-links">
             <li><a href="#cafes">Cafes</a></li>
             <li><a href="#recommended">Recommended</a></li>
@@ -26,7 +23,76 @@
                 <i class="fa-solid fa-right-from-bracket"></i>
             </a>
         </div>
+        <div class="top-navbarbtn">
+            <button id="sign-in-btn">Sign In</button>
+            <button id="sign-up-btn">Sign Up</button>
+        </div>
     </nav>
+
+    <div class="card-container" id="sign-in-card" style="display:none;">
+        <h2>Sign In</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flashes">
+              {% for category, message in messages %}
+                {% if category == 'error' %}
+                  <div class="alert alert-error">
+                    {{ message }}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        <form method="POST" action="/login">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required />
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required />
+          <button type="submit" class="submit-btn">Login</button>
+        </form>
+        <p style="margin-top: 10px;">Don't have an account? <span id="show-sign-up" style="color: blue; cursor: pointer; text-decoration: underline;">Sign Up</span></p>
+    </div>
+
+    <div class="card-container" id="sign-up-card" style="display:none;">
+        <h2>Sign Up</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flashes">
+              {% for category, message in messages %}
+                {% if category == 'success' %}
+                  <div class="alert alert-success">
+                    {{ message }}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        <form method="POST" action="/register">
+          <label for="reg-username">Username</label>
+          <input type="text" id="reg-username" name="username" required />
+          <label for="reg-password">Password</label>
+          <input type="password" id="reg-password" name="password" required />
+          <label for="first_name">First Name</label>
+          <input type="text" id="first_name" name="first_name" required />
+          <label for="last_name">Last Name</label>
+          <input type="text" id="last_name" name="last_name" required />
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required />
+          <label for="gender">Gender</label>
+          <select id="gender" name="gender" required>
+            <option value="">Select</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+          <label for="birthday">Birthday</label>
+          <input type="date" id="birthday" name="birthday" required />
+          <button type="submit" class="submit-btn">Register</button>
+        </form>
+        <p style="margin-top: 10px;">Already have an account? <span id="show-sign-in" style="color: blue; cursor: pointer; text-decoration: underline;">Sign In</span></p>
+    </div>
 
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -40,6 +106,8 @@
     {% endwith %}
 
     <!-- Main Content -->
+
+    <!-- Main Content -->
     <div class="dashboard-container">
         <section id="cafes">
             <h2>All Cafes</h2>
@@ -50,7 +118,7 @@
                     <div class="cafe-info">
                         <div class="cafe-card-header">
                             <h3>{{ cafe.name }}</h3>
-                            <button class="cafe-options-btn" title="View Details" onclick="openCafeModal({{ loop.index0 }})">
+                            <button class="cafe-options-btn" title="View Details" onclick="openCafeModal({ loop,index0 })">
                                 <i class="fa-solid fa-ellipsis"></i>
                             </button>
                         </div>
@@ -247,121 +315,206 @@
 </div>
 
     <script>
-    const currentUsername = "{{ user.username|e }}";
+        // Wrap all JS code in an IIFE to avoid redeclaration errors
+        (function() {
+            const currentUsername = "{{ user.username|e }}";
 
-        function formatDate(isoString) {
-            if (!isoString) return '';
-            const date = new Date(isoString);
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return date.toLocaleDateString(undefined, options);
-        }
-        
-        const cafes = {{ cafes|tojson }};
-        function openCafeModal(idx) {
-            const cafe = cafes[idx];
-            document.getElementById('modalCafeImg').src = cafe.image_url || "{{ url_for('static', filename='default_cafe.jpg') }}";
-            // Address (NEW)
-            let addressHtml = '';
-            if (cafe.address) {
-                addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>${cafe.address}</span>`;
-            } else {
-                addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>No address provided</span>`;
+            function formatDate(isoString) {
+                if (!isoString) return '';
+                const date = new Date(isoString);
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                return date.toLocaleDateString(undefined, options);
             }
-            document.getElementById('modalCafeAddress').innerHTML = addressHtml;
 
-            document.getElementById('modalCafeName').textContent = cafe.name;
-            document.getElementById('modalCafeDesc').textContent = cafe.description;
-            // Rating
-            let ratingHtml = '';
-            let ratings = cafe.ratings || [];
-            let ratingSum = ratings.reduce((a, b) => a + (b.rating || 0), 0);
-            let ratingCount = ratings.length;
-            let avgRating = ratingCount ? ratingSum / ratingCount : 0;
-            for (let i = 1; i <= 5; i++) {
-                ratingHtml += i <= avgRating
-                    ? '<i class="fa-solid fa-star" style="color:#ffd700"></i>'
-                    : '<i class="fa-regular fa-star" style="color:#ffd700"></i>';
+            const cafes = { cafes , tojson , safe };
+            function openCafeModal(idx) {
+                const cafe = cafes[idx];
+                document.getElementById('modalCafeImg').src = cafe.image_url || "{{ url_for('static', filename='default_cafe.jpg') }}";
+                // Address (NEW)
+                let addressHtml = '';
+                if (cafe.address) {
+                    addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>${cafe.address}</span>`;
+                } else {
+                    addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>No address provided</span>`;
+                }
+                document.getElementById('modalCafeAddress').innerHTML = addressHtml;
+
+                document.getElementById('modalCafeName').textContent = cafe.name;
+                document.getElementById('modalCafeDesc').textContent = cafe.description;
+                // Rating
+                let ratingHtml = '';
+                let ratings = cafe.ratings || [];
+                let ratingSum = ratings.reduce((a, b) => a + (b.rating || 0), 0);
+                let ratingCount = ratings.length;
+                let avgRating = ratingCount ? ratingSum / ratingCount : 0;
+                for (let i = 1; i <= 5; i++) {
+                    ratingHtml += i <= avgRating
+                        ? '<i class="fa-solid fa-star" style="color:#ffd700"></i>'
+                        : '<i class="fa-regular fa-star" style="color:#ffd700"></i>';
+                }
+                ratingHtml += `<span class="rating-number">${avgRating.toFixed(1)} / 5 (${ratingCount})</span>`;
+                document.getElementById('modalCafeRating').innerHTML = ratingHtml;
+                // Location
+                document.getElementById('modalCafeLocation').innerHTML = `<a href="${cafe.maps_url}" target="_blank" class="cafe-location"><i class="fa-solid fa-location-dot"></i> View on Maps</a>`;
+                // Comments
+                let commentsHtml = '';
+                if (cafe.comments && cafe.comments.length > 0) {
+                    cafe.comments.forEach(c => {
+                        let stars = '';
+                        let commentRating = c.rating !== undefined && c.rating !== null ? c.rating : 0;
+                        for (let i = 1; i <= 5; i++) {
+                            stars += i <= commentRating
+                                ? '<i class="fa-solid fa-star"></i>'
+                                : '<i class="fa-regular fa-star"></i>';
+                        }
+
+                        let deleteBtn = '';
+                        if (c.user === currentUsername && c._id) {
+                            deleteBtn = `
+                                <form method="POST" action="/delete_comment/${cafe._id}/${c._id}" style="display:inline;">
+                                    <button type="submit" class="delete-comment-btn" title="Delete comment" onclick="return confirm('Delete this comment?')">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            `;
+                        }
+
+                        commentsHtml += `<li>
+                            <span class="comment-stars">${stars}</span>
+                            <span class="comment-text">"${c.comment}"</span>
+                            <span class="comment-meta">
+                                <span class="comment-user">${c.user}</span>
+                                ${c.timestamp ? `<span class="comment-date">${formatDate(c.timestamp)}</span>` : ''}
+                                ${deleteBtn}
+                            </span>
+                        </li>`;
+                    });
+                } else {
+                    commentsHtml = '<li><em>No comments yet.</em></li>';
+                }
+                document.getElementById('modalCafeComments').innerHTML = commentsHtml;
+
+                document.getElementById('cafeModal').style.display = 'block';
+                document.body.style.overflow = 'hidden';
             }
-            ratingHtml += `<span class="rating-number">${avgRating.toFixed(1)} / 5 (${ratingCount})</span>`;
-            document.getElementById('modalCafeRating').innerHTML = ratingHtml;
-            // Location
-            document.getElementById('modalCafeLocation').innerHTML = `<a href="${cafe.maps_url}" target="_blank" class="cafe-location"><i class="fa-solid fa-location-dot"></i> View on Maps</a>`;
-            // Comments
-            let commentsHtml = '';
-            if (cafe.comments && cafe.comments.length > 0) {
-                cafe.comments.forEach(c => {
-                    let stars = '';
-                    let commentRating = c.rating !== undefined && c.rating !== null ? c.rating : 0;
-                    for (let i = 1; i <= 5; i++) {
-                        stars += i <= commentRating
-                            ? '<i class="fa-solid fa-star"></i>'
-                            : '<i class="fa-regular fa-star"></i>';
-                    }
+            function openProfileModal() {
+                document.getElementById('profileModal').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+            function closeProfileModal() {
+                document.getElementById('profileModal').style.display = 'none';
+                document.body.style.overflow = '';
+            }
+            function openEditProfileModal() {
+                document.getElementById('profileModal').style.display = 'none';
+                document.getElementById('editProfileModal').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+            function closeEditProfileModal() {
+                document.getElementById('editProfileModal').style.display = 'none';
+                document.body.style.overflow = '';
+            }
+            // Preview profile picture before upload
+            function previewProfilePic(event) {
+                const [file] = event.target.files;
+                if (file) {
+                    document.getElementById('editProfilePicPreview').src = URL.createObjectURL(file);
+                }
+            }
 
-                    let deleteBtn = '';
-                    if (c.user === currentUsername && c._id) {
-                        deleteBtn = `
-                            <form method="POST" action="/delete_comment/${cafe._id}/${c._id}" style="display:inline;">
-                                <button type="submit" class="delete-comment-btn" title="Delete comment" onclick="return confirm('Delete this comment?')">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </form>
-                        `;
-                    }
+            function closeCafeModal() {
+                document.getElementById('cafeModal').style.display = 'none';
+                document.body.style.overflow = '';
+            }
+            window.onclick = function(event) {
+                const modal = document.getElementById('cafeModal');
+                if (event.target == modal) {
+                    closeCafeModal();
+                }
+            }
 
-                    commentsHtml += `<li>
-                        <span class="comment-stars">${stars}</span>
-                        <span class="comment-text">"${c.comment}"</span>
-                        <span class="comment-meta">
-                            <span class="comment-user">${c.user}</span>
-                            ${c.timestamp ? `<span class="comment-date">${formatDate(c.timestamp)}</span>` : ''}
-                            ${deleteBtn}
-                        </span>
-                    </li>`;
+            // Sign In / Sign Up modal toggle scripts
+            const signInBtn = document.getElementById('sign-in-btn');
+            const signUpBtn = document.getElementById('sign-up-btn');
+            const signInCard = document.getElementById('sign-in-card');
+            const signUpCard = document.getElementById('sign-up-card');
+
+            // Create overlay div
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+            document.body.appendChild(overlay);
+
+            function showCard(card) {
+                card.style.display = 'block';
+                overlay.style.display = 'block';
+            }
+
+            function hideCards() {
+                signInCard.style.display = 'none';
+                signUpCard.style.display = 'none';
+                overlay.style.display = 'none';
+            }
+
+            signInBtn.addEventListener('click', () => {
+                if (signInCard.style.display === 'block') {
+                    hideCards();
+                } else {
+                    showCard(signInCard);
+                    signUpCard.style.display = 'none';
+                }
+            });
+
+            signUpBtn.addEventListener('click', () => {
+                if (signUpCard.style.display === 'block') {
+                    hideCards();
+                } else {
+                    showCard(signUpCard);
+                    signInCard.style.display = 'none';
+                }
+            });
+
+            // Hide cards when clicking on overlay
+            overlay.addEventListener('click', () => {
+                hideCards();
+            });
+
+            // Show sign-in card and overlay if error exists
+            if (document.body.dataset.loginError === "true") {
+                window.addEventListener('DOMContentLoaded', (event) => {
+                    showCard(signInCard);
                 });
-            } else {
-                commentsHtml = '<li><em>No comments yet.</em></li>';
             }
-            document.getElementById('modalCafeComments').innerHTML = commentsHtml;
-            
-            document.getElementById('cafeModal').style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-        function openProfileModal() {
-            document.getElementById('profileModal').style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-        function closeProfileModal() {
-            document.getElementById('profileModal').style.display = 'none';
-            document.body.style.overflow = '';
-        }
-        function openEditProfileModal() {
-            document.getElementById('profileModal').style.display = 'none';
-            document.getElementById('editProfileModal').style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-        function closeEditProfileModal() {
-            document.getElementById('editProfileModal').style.display = 'none';
-            document.body.style.overflow = '';
-        }
-        // Preview profile picture before upload
-        function previewProfilePic(event) {
-            const [file] = event.target.files;
-            if (file) {
-                document.getElementById('editProfilePicPreview').src = URL.createObjectURL(file);
-            }
-        }
 
-        function closeCafeModal() {
-            document.getElementById('cafeModal').style.display = 'none';
-            document.body.style.overflow = '';
-        }
-        window.onclick = function(event) {
-            const modal = document.getElementById('cafeModal');
-            if (event.target == modal) {
-                closeCafeModal();
+            // Show sign-up card and overlay if success exists
+            if (document.body.dataset.registerSuccess === "true") {
+                showCard(signUpCard);
             }
-        }
+
+            // Toggle between sign-in and sign-up cards
+            document.getElementById('show-sign-up').addEventListener('click', () => {
+                hideCards();
+                showCard(signUpCard);
+            });
+
+            document.getElementById('show-sign-in').addEventListener('click', () => {
+                hideCards();
+                showCard(signInCard);
+            });
+
+            // Auto-hide flash messages inside cards after 5 seconds
+            document.addEventListener('DOMContentLoaded', () => {
+                const flashContainers = document.querySelectorAll('.card-container .flashes');
+                flashContainers.forEach(flashContainer => {
+                    setTimeout(() => {
+                        flashContainer.style.transition = 'opacity 0.5s ease';
+                        flashContainer.style.opacity = '0';
+                        setTimeout(() => {
+                            flashContainer.remove();
+                        }, 500);
+                    }, 5000);
+                });
+            });
+        })();
     </script>
 </body>
 </html>

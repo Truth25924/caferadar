@@ -21,9 +21,25 @@
 
 body {
   font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-  background: linear-gradient(135deg, #f6fff9 0%, #e5f9ee 100%);
   color: #222;
   min-height: 100vh;
+}
+
+body {
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  color: #222;
+  min-height: 100vh;
+  background: linear-gradient(rgba(0,0,0,0.3)), url("/static/uploads/homepic.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Background for user dashboard */
+.dashboard-container {
+  border-radius: 12px;
+  padding: 1rem;
 }
 
 /* Navbar */
@@ -40,6 +56,25 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+/* Sign In / Sign Up buttons on user dashboard styled like home.html */
+#sign-in-btn,
+#sign-up-btn {
+  background: none;
+  border: none;
+  color: var(--primary-dark);
+  font-size: 16px;
+  margin-left: 20px;
+  cursor: pointer;
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  padding: 0;
+  text-decoration: underline;
+}
+
+#sign-in-btn:hover,
+#sign-up-btn:hover {
+  color: var(--primary);
 }
 
 .navbar-logo {
@@ -646,6 +681,73 @@ section h2 {
 .mt-2 { margin-top: 2rem; }
 .mb-2 { margin-bottom: 2rem; }
 
+/* Sign In / Sign Up Modal Styles */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 999;
+}
+
+.card-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: linear-gradient(to bottom right, rgba(255,255,255,0.9), rgba(187, 114, 4, 0.7));
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 20px;
+  display: none;
+  z-index: 1000;
+  color: black;
+}
+
+.card-container h2 {
+  margin-top: 0;
+}
+
+.card-container form {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-container label {
+  margin: 10px 0 5px;
+}
+
+.card-container input[type="text"],
+.card-container input[type="password"],
+.card-container input[type="email"],
+.card-container input[type="date"],
+.card-container select {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.card-container button.submit-btn {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.card-container button.submit-btn:hover {
+  background-color: #555;
+}
+
 /* Profile Modal & Forms */
 .close {
   position: absolute;
@@ -806,7 +908,7 @@ section h2 {
 .cafe-card {
   border: none;
   box-shadow: 0 4px 24px rgba(0, 177, 79, 0.13), 0 1.5px 0 0 #e5e7eb;
-  background: linear-gradient(135deg, #fff 80%, #e5f9ee 100%);
+  background: rgba(46, 45, 45, 0.6);
   transition: box-shadow 0.22s, transform 0.22s;
   border-radius: 18px;
 }
