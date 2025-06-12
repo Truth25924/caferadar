@@ -115,7 +115,12 @@
                 <div class="cafe-card recommended">
                     <img src="{{ cafe.image_url or url_for('static', filename='default_cafe.jpg') }}" alt="{{ cafe.name }} image" class="cafe-img" />
                     <div class="cafe-info">
-                        <h3>{{ cafe.name }}</h3>
+                        <div class="cafe-card-header">
+                            <h3>{{ cafe.name }}</h3>
+                            <button class="cafe-options-btn" title="View Details" onclick="openCafeModal({{ loop.index0 }})">
+                                <i class="fa-solid fa-ellipsis"></i>
+                            </button>
+                        </div>
                         <p>{{ cafe.description }}</p>
                         <a href="{{ cafe.maps_url }}" target="_blank" class="cafe-location">
                             <i class="fa-solid fa-location-dot"></i> View on Maps
@@ -347,8 +352,8 @@ console.log("cafes variable:", cafes);
             showCard(signInCard);
         });
 
-        // Auto-hide flash messages inside cards after 5 seconds
-        const flashContainers = document.querySelectorAll('.card-container .flashes');
+        // Auto-hide flash messages inside cards after 3 seconds
+        const flashContainers = document.querySelectorAll('.flashes');
         flashContainers.forEach(flashContainer => {
             setTimeout(() => {
                 flashContainer.style.transition = 'opacity 0.5s ease';
@@ -356,82 +361,10 @@ console.log("cafes variable:", cafes);
                 setTimeout(() => {
                     flashContainer.remove();
                 }, 500);
-            }, 5000);
+            }, 3000);
         });
     });
-
-    // Cafe modal functions and data
-    const cafes = {{ cafes|tojson|safe }};
-    console.log("cafes variable:", cafes);
-    function openCafeModal(idx) {
-        console.log("openCafeModal called with idx:", idx);
-        const cafe = cafes[idx];
-        console.log("Cafe data:", cafe);
-        document.getElementById('modalCafeImg').src = cafe.image_url || "{{ url_for('static', filename='default_cafe.jpg') }}";
-        let addressHtml = '';
-        if (cafe.address) {
-            addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>${cafe.address}</span>`;
-        } else {
-            addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>No address provided</span>`;
-        }
-        document.getElementById('modalCafeAddress').innerHTML = addressHtml;
-
-        document.getElementById('modalCafeName').textContent = cafe.name;
-        document.getElementById('modalCafeDesc').textContent = cafe.description;
-
-        let ratingHtml = '';
-        let ratings = cafe.ratings || [];
-        let ratingSum = ratings.reduce((a, b) => a + (b.rating || 0), 0);
-        let ratingCount = ratings.length;
-        let avgRating = ratingCount ? ratingSum / ratingCount : 0;
-        for (let i = 1; i <= 5; i++) {
-            ratingHtml += i <= avgRating
-                ? '<i class="fa-solid fa-star" style="color:#ffd700"></i>'
-                : '<i class="fa-regular fa-star" style="color:#ffd700"></i>';
-        }
-        ratingHtml += `<span class="rating-number">${avgRating.toFixed(1)} / 5 (${ratingCount})</span>`;
-        document.getElementById('modalCafeRating').innerHTML = ratingHtml;
-
-        document.getElementById('modalCafeLocation').innerHTML = `<a href="${cafe.maps_url}" target="_blank" class="cafe-location"><i class="fa-solid fa-location-dot"></i> View on Maps</a>`;
-
-        let commentsHtml = '';
-        if (cafe.comments && cafe.comments.length > 0) {
-            cafe.comments.forEach(c => {
-                let stars = '';
-                let commentRating = c.rating !== undefined && c.rating !== null ? c.rating : 0;
-                for (let i = 1; i <= 5; i++) {
-                    stars += i <= commentRating
-                        ? '<i class="fa-solid fa-star"></i>'
-                        : '<i class="fa-regular fa-star"></i>';
-                }
-
-                commentsHtml += `<li>
-                    <span class="comment-stars">${stars}</span>
-                    <span class="comment-text">"${c.comment}"</span>
-                    <span class="comment-user">${c.user}</span>
-                </li>`;
-            });
-        } else {
-            commentsHtml = '<li><em>No comments yet.</em></li>';
-        }
-        document.getElementById('modalCafeComments').innerHTML = commentsHtml;
-
-        document.getElementById('cafeModal').style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
-    function closeCafeModal() {
-        document.getElementById('cafeModal').style.display = 'none';
-        document.body.style.overflow = '';
-    }
-
-    window.openCafeModal = openCafeModal;
-    window.closeCafeModal = closeCafeModal;
-
-    window.onclick = function(event) {
-        const modal = document.getElementById('cafeModal');
-        if (event.target == modal) {
-            closeCafeModal();
-        }
-    }
 })();
     </script>
+</body>
+</html>

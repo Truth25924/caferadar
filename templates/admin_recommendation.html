@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Manage Recommendations</h1>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flashes">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<form method="POST" action="{{ url_for('update_recommendation') }}">
+  <table class="recommendation-table">
+    <thead>
+      <tr>
+        <th>Cafe Name</th>
+        <th>Recommended</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cafe in cafes %}
+      <tr>
+        <td>{{ cafe.name }}</td>
+        <td>
+          <input type="checkbox" name="recommended_cafes" value="{{ cafe._id }}" {% if cafe.is_recommended %}checked{% endif %}>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <button type="submit" class="save-btn">Save Changes</button>
+</form>
+
+<style>
+  h1 {
+    color: var(--primary-dark);
+    margin-bottom: 1.5rem;
+  }
+  .recommendation-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+  }
+  .recommendation-table th,
+  .recommendation-table td {
+    border: 1px solid var(--gray-light);
+    padding: 0.75rem 1rem;
+    text-align: left;
+  }
+  .recommendation-table th {
+    background-color: var(--secondary);
+    font-weight: 600;
+  }
+  .save-btn {
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .save-btn:hover {
+    background: var(--primary-dark);
+  }
+</style>
+{% endblock %}

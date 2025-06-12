@@ -56,7 +56,12 @@
                 <div class="cafe-card recommended">
                     <img src="{{ cafe.image_url or url_for('static', filename='default_cafe.jpg') }}" alt="{{ cafe.name }} image" class="cafe-img">
                     <div class="cafe-info">
-                        <h3>{{ cafe.name }}</h3>
+                        <div class="cafe-card-header">
+                            <h3>{{ cafe.name }}</h3>
+                            <button class="cafe-options-btn" title="View Details" onclick="openCafeModal({{ loop.index0 }})">
+                                <i class="fa-solid fa-ellipsis"></i>
+                            </button>
+                        </div>
                         <p>{{ cafe.description }}</p>
                         <a href="{{ cafe.maps_url }}" target="_blank" class="cafe-location">
                             <i class="fa-solid fa-location-dot"></i> View on Maps
@@ -453,7 +458,7 @@
                 showCard(signInCard);
             });
 
-            // Auto-hide flash messages inside cards after 5 seconds
+            // Auto-hide flash messages inside cards after 3 seconds
             document.addEventListener('DOMContentLoaded', () => {
                 const flashContainers = document.querySelectorAll('.card-container .flashes');
                 flashContainers.forEach(flashContainer => {
@@ -463,7 +468,7 @@
                         setTimeout(() => {
                             flashContainer.remove();
                         }, 500);
-                    }, 5000);
+                    }, 3000);
                 });
             });
         })();

@@ -50,6 +50,12 @@
               <span class="title">Users</span>
             </a>
           </li>
+          <li class="{% if request.endpoint == 'admin_recommendation' %}active{% endif %}">
+            <a href="{{ url_for('admin_recommendation') }}">
+              <span class="icon"><i class="fa-solid fa-star"></i></span>
+              <span class="title">Recommendation</span>
+            </a>
+          </li>
           <li>
             <a href="{{ url_for('logout') }}">
               <span class="icon"

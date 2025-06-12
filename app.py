@@ -150,6 +150,29 @@ def dashboard():
         cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
         cafes = normalize_cafe_ratings_comments(cafes) 
         return render_template('user_dashboard.html', user=user, cafes=cafes)
+
+# Admin recommendation page
+@app.route('/admin/recommendation')
+@admin_required
+def admin_recommendation():
+    cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
+    # Add is_recommended field default to False if missing
+    for cafe in cafes:
+        if 'is_recommended' not in cafe:
+            cafe['is_recommended'] = False
+    return render_template('admin_recommendation.html', cafes=cafes)
+
+# Handle recommendation update
+@app.route('/admin/recommendation/update', methods=['POST'])
+@admin_required
+def update_recommendation():
+    recommended_ids = request.form.getlist('recommended_cafes')
+    all_cafes = cafes_col.find()
+    for cafe in all_cafes:
+        is_recommended = str(cafe['_id']) in recommended_ids
+        cafes_col.update_one({'_id': cafe['_id']}, {'$set': {'is_recommended': is_recommended}})
+    flash('Recommendation settings updated successfully!', 'success')
+    return redirect(url_for('admin_recommendation'))
     
 # 2ND PART OF DASHBOARD PY FUNCTION SERIALIZE CAFE(CLICK TO ENLARGE THE CAFE TABLE)
 # Serialize_cafe to ensure ratings/comments are serializable

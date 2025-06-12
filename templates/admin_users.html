@@ -73,6 +73,20 @@ window.onclick = function(event) {
     closeUserDetails();
   }
 }
+
+// Auto-hide flash messages inside cards after 3 seconds
+document.addEventListener('DOMContentLoaded', () => {
+    const flashContainers = document.querySelectorAll('.card-container .flashes');
+    flashContainers.forEach(flashContainer => {
+        setTimeout(() => {
+            flashContainer.style.transition = 'opacity 0.5s ease';
+            flashContainer.style.opacity = '0';
+            setTimeout(() => {
+                flashContainer.remove();
+            }, 500);
+        }, 3000);
+    });
+});
 </script>
 
 {% endblock %}
