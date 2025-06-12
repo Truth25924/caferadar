@@ -1,0 +1,69 @@
+[{
+  "_id": {
+    "$oid": "68454e24c46ce90e98146b52"
+  },
+  "username": "admin",
+  "password": "scrypt:32768:8:1$qUe0o4OaqWDJutx5$42af914c35dbf113fe8587964f0ca77f3f1ca9cd8d9692fe186082551c1c53785735a6a3f510386016c1d1b5685f27a4a61485d9a580f3d98f7488c602dd1834",
+  "first_name": "pol",
+  "last_name": "padilla",
+  "email": "padilla@gmail.com",
+  "gender": "male",
+  "birthday": "2025-06-11",
+  "sex": "male",
+  "role": "admin"
+},
+{
+  "_id": {
+    "$oid": "68454e4cc46ce90e98146b53"
+  },
+  "username": "user",
+  "password": "scrypt:32768:8:1$MwPjcVA4ELSEHOs2$ea7b2d4f95caeff28c0009767f6e90819674db009b34c30c285c2c8b0be96bb610b90e414acd24fcfc0fa1f4acd1193cdb9dcdae0f7c89493004909c108587f5",
+  "first_name": "user",
+  "last_name": "test",
+  "email": "test@gmail.com",
+  "gender": "male",
+  "birthday": "2025-06-11",
+  "sex": "male",
+  "role": "user"
+},
+{
+  "_id": {
+    "$oid": "6849cf802d76cf9cba5f2082"
+  },
+  "username": "pol",
+  "password": "scrypt:32768:8:1$vtjYViIeq6nCnfbn$4a6b9cde9fcd4d7e83c2cc46f19ec03fd8181630846c8054e895b8c81ecb5302f31e9634d3fa1677f17301691a28a7d8726098095794c143ebe07e9c71f57462",
+  "first_name": "pol",
+  "last_name": "padilla",
+  "email": "pol123@gmail.com",
+  "gender": "Male",
+  "birthday": "2025-07-02",
+  "role": "user",
+  "contactnumber": "",
+  "profile_pic_url": "/static/uploads/access_point.jpg"
+},
+{
+  "_id": {
+    "$oid": "684a60a8b52d0405450098db"
+  },
+  "username": "polpadilla",
+  "password": "scrypt:32768:8:1$Vs7MWwYrzc36o1LC$859018dd77cb428865879f7aa1a6471851e57b000c50ef89c8fc96765e2d0024fb2e5f3472ad1aef353342c82a0b53cbf1686ea23e07c4790dfc1dbbe8435e6c",
+  "first_name": "test",
+  "last_name": "user",
+  "email": "pol@gmail.com",
+  "gender": "male",
+  "birthday": "2025-07-02",
+  "role": "user"
+},
+{
+  "_id": {
+    "$oid": "684aa551e4dd5add27015cab"
+  },
+  "username": "polpol",
+  "password": "scrypt:32768:8:1$BaJC8cZEVdcDyjWk$c699f0e8f3357782be51aa4f14dcce1813f87a1a110e159af68ccdf00167e070a16402322c3c306961be0d51742c94bbdc1472e4672b3dfae458af8348ab4ead",
+  "first_name": "test",
+  "last_name": "user",
+  "email": "pol@gmail.com",
+  "gender": "male",
+  "birthday": "2025-07-02",
+  "role": "user"
+}]
