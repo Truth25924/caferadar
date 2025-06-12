@@ -37,8 +37,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(56, 55, 55, 0.7);
-  height: var(--navbar-height);
+  background: #222;
+  height: 4.5rem;
   box-shadow: 0 4px 16px rgba(0, 177, 79, 0.10);
   position: fixed;
   top: 0;
@@ -47,6 +47,30 @@ body {
   z-index: 100;
   width: 100%;
   margin: 0;
+  padding: 0 2rem;
+}
+
+.navbar h2{
+  background: none;
+  border: none;
+  color: var(--brown2);
+  font-size: 1.5rem;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-weight: 500;
+  margin: 1rem;
+  text-decoration: none;
+}
+
+.navbar-spacer {
+  flex: 1 1 0;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  padding: 6rem;
 }
 
 #sign-in-btn,
@@ -55,11 +79,10 @@ body {
   border: none;
   color: var(--brown2);
   font-size: 1.2rem;
-  margin: 12px;
   cursor: pointer;
   font-family: var(--font-family);
   font-weight: 500;
-  padding: 0;
+  margin: 1rem;
   text-decoration: none;
 }
 
@@ -69,9 +92,17 @@ body {
 }
 
 .navbar-links {
-  list-style: none;
   display: flex;
   gap: 3rem;
+  justify-content: center;
+  align-items: center;
+  flex: 0 1 auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .navbar-links li a {
@@ -87,12 +118,6 @@ body {
   color: var(--primary-dark);
 }
 
-.navbar-profile-group {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-}
-
 .navbarbtn {
   display: flex;
   align-items: center;
@@ -101,24 +126,31 @@ body {
 
 /* Dashboard Container */
 .dashboard-container {
-  max-width: 1200px;
-  margin: 3rem auto 0 auto;
+  display: flex;
+  flex-direction: column;      /* Center children horizontally */
+  width: 100%;
 }
 
 /* Section Titles */
 section h2 {
-  color: var(--primary-dark);
+  color: var(--brown2);
   margin-bottom: 1.2rem;
   font-size: 2rem;
   font-weight: 700;
+  margin-left: 23rem;  
+  margin-top: 4rem;
+        /* Align titles to the left */
 }
 
 /* Cafe List & Cards */
 .cafe-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
-  margin-bottom: 2.5rem;
+  justify-content: center;   /* Center cards horizontally */
+  gap: 2rem;                 /* Space between cards */
+  margin: 2rem auto 0 auto;  /* Center the container itself */
+  max-width: 1200px;         /* Optional: limit width for nice centering */
+  padding: 0 1rem;
 }
 
 .cafe-card {

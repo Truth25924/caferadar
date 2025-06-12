@@ -6,15 +6,22 @@
     <title>CafeRadar - User Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='guest.css') }}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
     <body>
         <!-- Navigation Bar -->
         <header class="navbar">
+            <a href="{{ url_for('home') }}" style="text-decoration: none;">
+                <h2 style="display: flex; align-items: center; gap: 0.3rem; margin: 0;">
+                    CafeRadar
+                    <span class="material-icons" style="vertical-align: middle; font-size: 28px; margin-right: 6px;">coffee</span>
+                </h2>
+            </a>
             <ul class="navbar-links">
                 <li><a href="#cafes">Cafes</a></li>
                 <li><a href="#recommended">Recommended</a></li>
             </ul>
-            <div class="navbar-profile-group">
+            <div class="navbar-actions">
                 <div class="navbarbtn">
                     <button id="sign-in-btn">Sign In</button>
                     <button id="sign-up-btn">Sign Up</button>
@@ -100,6 +107,43 @@
 
     <!-- Main Content -->
     <div class="dashboard-container">
+        <!--$$$ Recommendation Section $$$-->
+        <section id="recommended">
+            <h2>Recommended Cafes</h2>
+            <div class="cafe-list">
+                {% for cafe in cafes if cafe.is_recommended %}
+                <div class="cafe-card recommended">
+                    <img src="{{ cafe.image_url or url_for('static', filename='default_cafe.jpg') }}" alt="{{ cafe.name }} image" class="cafe-img" />
+                    <div class="cafe-info">
+                        <h3>{{ cafe.name }}</h3>
+                        <p>{{ cafe.description }}</p>
+                        <a href="{{ cafe.maps_url }}" target="_blank" class="cafe-location">
+                            <i class="fa-solid fa-location-dot"></i> View on Maps
+                        </a>
+                        {% set ratings = cafe.ratings if cafe.ratings else [] %}
+                        {% set rating_sum = ratings | map(attribute='rating') | sum %}
+                        {% set rating_count = ratings | length %}
+                        {% set rating = (rating_sum / rating_count) if rating_count else 0 %}
+                        <div class="cafe-rating">
+                            {% for i in range(1, 6) %}
+                            {% if i <= rating %}
+                            <i class="fa-solid fa-star" style="color: #ffd700"></i>
+                            {% else %}
+                            <i class="fa-regular fa-star" style="color: #ffd700"></i>
+                            {% endif %}
+                            {% endfor %}
+                            <span class="rating-number">{{ "%.1f"|format(rating) }} / 5 ({{ rating_count }})</span>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p>No recommended cafes yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <!-- ALL CAFES -->
         <section id="cafes">
             <h2>All Cafes</h2>
             <div class="cafe-list">
@@ -175,43 +219,6 @@
                 {% endfor %}
             </div>
         </section>
-
-        <!--$$$ Recommendation Section $$$-->
-
-        <section id="recommended">
-            <h2>Recommended Cafes</h2>
-            <div class="cafe-list">
-                {% for cafe in cafes if cafe.is_recommended %}
-                <div class="cafe-card recommended">
-                    <img src="{{ cafe.image_url or url_for('static', filename='default_cafe.jpg') }}" alt="{{ cafe.name }} image" class="cafe-img" />
-                    <div class="cafe-info">
-                        <h3>{{ cafe.name }}</h3>
-                        <p>{{ cafe.description }}</p>
-                        <a href="{{ cafe.maps_url }}" target="_blank" class="cafe-location">
-                            <i class="fa-solid fa-location-dot"></i> View on Maps
-                        </a>
-                        {% set ratings = cafe.ratings if cafe.ratings else [] %}
-                        {% set rating_sum = ratings | map(attribute='rating') | sum %}
-                        {% set rating_count = ratings | length %}
-                        {% set rating = (rating_sum / rating_count) if rating_count else 0 %}
-                        <div class="cafe-rating">
-                            {% for i in range(1, 6) %}
-                            {% if i <= rating %}
-                            <i class="fa-solid fa-star" style="color: #ffd700"></i>
-                            {% else %}
-                            <i class="fa-regular fa-star" style="color: #ffd700"></i>
-                            {% endif %}
-                            {% endfor %}
-                            <span class="rating-number">{{ "%.1f"|format(rating) }} / 5 ({{ rating_count }})</span>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <p>No recommended cafes yet.</p>
-                {% endfor %}
-            </div>
-        </section>
-    </div>
 
     <!-- Cafe Modal -->
     <div id="cafeModal" class="cafe-modal" style="display:none;">

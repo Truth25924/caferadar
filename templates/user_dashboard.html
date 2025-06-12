@@ -6,10 +6,17 @@
     <title>CafeRadar - User Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='user.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
     <!-- Navigation Bar -->
     <header class="navbar">
+    <a href="{{ url_for('home') }}" style="text-decoration: none;">
+        <h2 style="display: flex; align-items: center; gap: 0.3rem; margin: 0;">
+            CafeRadar
+            <span class="material-icons" style="vertical-align: middle; font-size: 28px; margin-right: 6px;">coffee</span>
+        </h2>
+    </a>
     <div class="navbar-spacer"></div>
     <ul class="navbar-links">
         <li><a href="#cafes">Cafes</a></li>
@@ -24,7 +31,7 @@
             <i class="fa-solid fa-right-from-bracket"></i>
         </a>
     </div>
-</header>
+    </header>
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
@@ -36,11 +43,51 @@
       {% endif %}
     {% endwith %}
 
-    <!-- Main Content -->
 
     <!-- Main Content -->
     <div class="dashboard-container">
-        <section id="cafes">
+        
+    <!--$$$ Recommendation Section $$$-->
+
+        <section id="recommended">
+            <h2>Recommended Cafes</h2>
+            <div class="cafe-list">
+                {% for cafe in cafes if cafe.is_recommended %}
+                <div class="cafe-card recommended">
+                    <img src="{{ cafe.image_url or url_for('static', filename='default_cafe.jpg') }}" alt="{{ cafe.name }} image" class="cafe-img">
+                    <div class="cafe-info">
+                        <h3>{{ cafe.name }}</h3>
+                        <p>{{ cafe.description }}</p>
+                        <a href="{{ cafe.maps_url }}" target="_blank" class="cafe-location">
+                            <i class="fa-solid fa-location-dot"></i> View on Maps
+                        </a>
+                        {% set ratings = cafe.ratings if cafe.ratings else [] %}
+                        {% set rating_sum = ratings | map(attribute='rating') | sum %}
+                        {% set rating_count = ratings | length %}
+                        {% set rating = (rating_sum / rating_count) if rating_count else 0 %}
+                        <div class="cafe-rating">
+                            {% for i in range(1, 6) %}
+                                {% if i <= rating %}
+                                    <i class="fa-solid fa-star" style="color: #ffd700"></i>
+                                {% else %}
+                                    <i class="fa-regular fa-star" style="color: #ffd700"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="rating-number">
+                                {{ "%.1f"|format(rating) }} / 5 ({{ rating_count }})
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p>No recommended cafes yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <!--$$$ All Cafes Section $$$-->
+    <section id="cafes">
             <h2>All Cafes</h2>
             <div class="cafe-list">
                 {% for cafe in cafes %}
@@ -117,45 +164,6 @@
             </div>
         </section>
 
-    <!--$$$ Recommendation Section $$$-->
-
-        <section id="recommended">
-            <h2>Recommended Cafes</h2>
-            <div class="cafe-list">
-                {% for cafe in cafes if cafe.is_recommended %}
-                <div class="cafe-card recommended">
-                    <img src="{{ cafe.image_url or url_for('static', filename='default_cafe.jpg') }}" alt="{{ cafe.name }} image" class="cafe-img">
-                    <div class="cafe-info">
-                        <h3>{{ cafe.name }}</h3>
-                        <p>{{ cafe.description }}</p>
-                        <a href="{{ cafe.maps_url }}" target="_blank" class="cafe-location">
-                            <i class="fa-solid fa-location-dot"></i> View on Maps
-                        </a>
-                        {% set ratings = cafe.ratings if cafe.ratings else [] %}
-                        {% set rating_sum = ratings | map(attribute='rating') | sum %}
-                        {% set rating_count = ratings | length %}
-                        {% set rating = (rating_sum / rating_count) if rating_count else 0 %}
-                        <div class="cafe-rating">
-                            {% for i in range(1, 6) %}
-                                {% if i <= rating %}
-                                    <i class="fa-solid fa-star" style="color: #ffd700"></i>
-                                {% else %}
-                                    <i class="fa-regular fa-star" style="color: #ffd700"></i>
-                                {% endif %}
-                            {% endfor %}
-                            <span class="rating-number">
-                                {{ "%.1f"|format(rating) }} / 5 ({{ rating_count }})
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <p>No recommended cafes yet.</p>
-                {% endfor %}
-            </div>
-        </section>
-    </div>
-
     <!-- Profile Modal -->
     <div id="cafeModal" class="cafe-modal">
         <div class="cafe-modal-content">
@@ -194,11 +202,11 @@
   </div>
 </div>
 
-<!-- Profile Edit Modal (Form) -->
+    <!-- Profile Edit Modal (Form) -->
 
 <div id="editProfileModal" style="display:none; position:fixed; z-index:1003; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5);">
     <form class="profile-form" method="POST" action="{{ url_for('edit_profile') }}" enctype="multipart/form-data" style="position:relative; max-width:400px; margin:5vh auto; top:5vh;">
-        <span class="close profile-modal-close" onclick="closeEditProfileModal()" style="position:absolute; top:1.2rem; right:1.2rem; font-size:1.5rem; color:#888; cursor:pointer;">&times;</span>
+        <span class="close edit-profile-modal-close" onclick="closeEditProfileModal(event)" style="position:absolute; top:0.8rem; right: 0.8rem; font-size:1.5rem; color:#888; cursor:pointer;">&times;</span>
         <div class="profile-pic-section" style="position:relative; display:flex; flex-direction:column; align-items:center;">
 
         <!-- Profile Picture with Camera Icon Overlay -->
@@ -337,6 +345,12 @@
                 document.getElementById('profileModal').style.display = 'none';
                 document.body.style.overflow = '';
             }
+            
+            window.openProfileModal = openProfileModal;
+            window.closeProfileModal = closeProfileModal;
+            window.openEditProfileModal = openEditProfileModal;
+            window.closeEditProfileModal = closeEditProfileModal;
+
             function openEditProfileModal() {
                 document.getElementById('profileModal').style.display = 'none';
                 document.getElementById('editProfileModal').style.display = 'block';
@@ -353,6 +367,8 @@
                     document.getElementById('editProfilePicPreview').src = URL.createObjectURL(file);
                 }
             }
+
+            window.previewProfilePic = previewProfilePic;
 
             function closeCafeModal() {
                 document.getElementById('cafeModal').style.display = 'none';
