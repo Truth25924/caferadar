@@ -1,20 +1,77 @@
 from flask import Flask, render_template, request, redirect, session, url_for, make_response, flash, jsonify
-from pymongo import MongoClient
+import sqlite3
+from contextlib import closing
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
-from bson.objectid import ObjectId
 import os
 from datetime import datetime
-from flask_login import current_user, login_required
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  
 
-client = MongoClient("mongodb://localhost:27017")
-db = client['caferadar']
-users_col = db['users']
-cafes_col = db['cafes']
+def init_db():
+    with closing(sqlite3.connect('caferadar.db')) as conn:
+        with conn:
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE NOT NULL,
+                    password TEXT NOT NULL,
+                    first_name TEXT NOT NULL,
+                    last_name TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    gender TEXT NOT NULL,
+                    birthday TEXT NOT NULL,
+                    contactnumber TEXT,
+                    role TEXT NOT NULL
+                )
+            ''')
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS cafes (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    description TEXT,
+                    maps_url TEXT,
+                    address TEXT,
+                    image_url TEXT
+                )
+            ''')
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS ratings (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    cafe_id INTEGER,
+                    user TEXT,
+                    rating INTEGER,
+                    timestamp TEXT,
+                    FOREIGN KEY (cafe_id) REFERENCES cafes(id)
+                )
+            ''')
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS comments (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    cafe_id INTEGER,
+                    user TEXT,
+                    comment TEXT,
+                    timestamp TEXT,
+                    rating INTEGER,
+                    FOREIGN KEY (cafe_id) REFERENCES cafes(id)
+                )
+            ''')
+            conn.execute('''
+            CREATE TABLE IF NOT EXISTS cafe_recommendations (
+            cafe_id INTEGER PRIMARY KEY,
+            is_recommended INTEGER DEFAULT 0,
+            FOREIGN KEY (cafe_id) REFERENCES cafes(id)
+                )
+            ''')
+
+try:
+    with sqlite3.connect('caferadar.db') as conn:
+        conn.execute('ALTER TABLE users ADD COLUMN profile_pic_url TEXT')
+except sqlite3.OperationalError:
+    # Column already exists
+    pass
 
 
 UPLOAD_FOLDER = os.path.join('static', 'uploads')
@@ -50,12 +107,33 @@ def add_cache_control(response):
     response.headers["Expires"] = "-1"
     return response
 
+def get_cafes_with_details():
+    with sqlite3.connect('caferadar.db') as conn:
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM cafes')
+        cafes = []
+        for cafe_row in cur.fetchall():
+            cafe = dict(zip([column[0] for column in cur.description], cafe_row))
+            # Get ratings
+            cur2 = conn.cursor()
+            cur2.execute('SELECT user, rating, timestamp FROM ratings WHERE cafe_id=?', (cafe['id'],))
+            cafe['ratings'] = [dict(zip(['user', 'rating', 'timestamp'], row)) for row in cur2.fetchall()]
+            # Get comments
+            cur2.execute('SELECT id, user, comment, timestamp, rating FROM comments WHERE cafe_id=?', (cafe['id'],))
+            cafe['comments'] = [dict(zip(['id', 'user', 'comment', 'timestamp', 'rating'], row)) for row in cur2.fetchall()]
+            # Recommendation
+            cur2.execute('SELECT is_recommended FROM cafe_recommendations WHERE cafe_id=?', (cafe['id'],))
+            rec = cur2.fetchone()
+            cafe['is_recommended'] = bool(rec[0]) if rec else False
+            cafes.append(cafe)
+    return cafes
+
+
 @app.route('/')
 def home():
     if 'username' in session:
         return redirect('/dashboard')
-    cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
-    cafes = normalize_cafe_ratings_comments(cafes)
+    cafes = get_cafes_with_details()
     show_sign_in = request.args.get('show_sign_in', 'false').lower() == 'true'
     return render_template('home.html', cafes=cafes, show_sign_in=show_sign_in)
 
@@ -71,45 +149,34 @@ def register():
         email = request.form['email']
         gender = request.form['gender']
         birthday = request.form['birthday']
-        contactnumber = request.form.get('contactnumber', None)  
-
-        from flask import flash
-
-        if users_col.find_one({'username': username}):
-            flash("Username already exists!", "error")
-            cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
-            cafes = normalize_cafe_ratings_comments(cafes)
-            return render_template('home.html', show_sign_up=True, cafes=cafes)
+        contactnumber = request.form.get('contactnumber', None)
 
         hashed_password = generate_password_hash(password)
 
-        user_count = users_col.count_documents({})
-        if user_count == 0:
-            role = 'admin'
-        else:
-            role = 'user'
+        # Determine role
+        with sqlite3.connect('caferadar.db') as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT COUNT(*) FROM users')
+            user_count = cur.fetchone()[0]
+            role = 'admin' if user_count == 0 else 'user'
 
-        user_data = {
-            'username': username,
-            'password': hashed_password,
-            'first_name': first_name,
-            'last_name': last_name,
-            'email': email,
-            'gender': gender,
-            'birthday': birthday,
-            'role': role
-        }
-        if contactnumber:
-            user_data['contactnumber'] = contactnumber
+            # Check if username exists
+            cur.execute('SELECT * FROM users WHERE username = ?', (username,))
+            if cur.fetchone():
+                flash("Username already exists!", "error")
+                # You may want to reload cafes from MongoDB or SQLite as needed
+                return render_template('home.html', show_sign_up=True, cafes=[])
+            
+            # Insert new user
+            cur.execute('''
+                INSERT INTO users (username, password, first_name, last_name, email, gender, birthday, contactnumber, role)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (username, hashed_password, first_name, last_name, email, gender, birthday, contactnumber, role))
+            conn.commit()
 
-        users_col.insert_one(user_data)
         flash("Account Created Successfully.", "success")
-        cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
-        cafes = normalize_cafe_ratings_comments(cafes)
-        return render_template('home.html', show_sign_up=True, cafes=cafes)
-    cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
-    cafes = normalize_cafe_ratings_comments(cafes)
-    return render_template('home.html', cafes=cafes)
+        return render_template('home.html', show_sign_up=True, cafes=[])
+    return render_template('home.html', cafes=[])
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -118,92 +185,61 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user = users_col.find_one({'username': username})
-        if user and check_password_hash(user['password'], password):
-            session['username'] = user['username']
-            session['role'] = user['role']
-            return redirect('/dashboard')
-        
+        with sqlite3.connect('caferadar.db') as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT username, password, role FROM users WHERE username = ?', (username,))
+            user = cur.fetchone()
+            if user and check_password_hash(user[1], password):
+                session['username'] = user[0]
+                session['role'] = user[2]
+                return redirect('/dashboard')
         flash("Invalid username or password.", "error")
-        cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
-        cafes = normalize_cafe_ratings_comments(cafes)
-        return render_template('home.html', show_sign_in=True, cafes=cafes)
-    return render_template('home.html', cafes=[serialize_cafe(cafe) for cafe in cafes_col.find()])
+        return render_template('home.html', show_sign_in=True, cafes=[])
+    return render_template('home.html', cafes=[])
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
+    cafes = get_cafes_with_details()
     if session['role'] == 'admin':
-        cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
-        for cafe in cafes:
-            cafe['ratings'] = cafe.get('ratings', [])
-            cafe['comments'] = cafe.get('comments', [])
-        users = list(users_col.find({}, {'_id': 1}))
+        with sqlite3.connect('caferadar.db') as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT id, username FROM users')
+            users = [dict(zip(['id', 'username'], row)) for row in cur.fetchall()]
         return render_template('admin_dashboard.html', cafes=cafes, users=users)
     else:
-        user = users_col.find_one({'username': session['username']})
-
-        if user and '_id' in user:
-            user['_id'] = str(user['_id'])
-        cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
-        cafes = normalize_cafe_ratings_comments(cafes) 
+        with sqlite3.connect('caferadar.db') as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT * FROM users WHERE username=?', (session['username'],))
+            user_row = cur.fetchone()
+            user = dict(zip([column[0] for column in cur.description], user_row)) if user_row else None
         return render_template('user_dashboard.html', user=user, cafes=cafes)
 
 @app.route('/admin/recommendation')
 @admin_required
 def admin_recommendation():
-    cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
-
-    for cafe in cafes:
-        if 'is_recommended' not in cafe:
-            cafe['is_recommended'] = False
+    cafes = get_cafes_with_details()
     return render_template('admin_recommendation.html', cafes=cafes)
-
 
 @app.route('/admin/recommendation/update', methods=['POST'])
 @admin_required
 def update_recommendation():
-    recommended_ids = request.form.getlist('recommended_cafes')
-    all_cafes = cafes_col.find()
-    for cafe in all_cafes:
-        is_recommended = str(cafe['_id']) in recommended_ids
-        cafes_col.update_one({'_id': cafe['_id']}, {'$set': {'is_recommended': is_recommended}})
+    recommended_ids = set(map(int, request.form.getlist('recommended_cafes')))
+    with sqlite3.connect('caferadar.db') as conn:
+        cur = conn.cursor()
+        cur.execute('DELETE FROM cafe_recommendations')
+        for cafe_id in recommended_ids:
+            cur.execute('INSERT INTO cafe_recommendations (cafe_id, is_recommended) VALUES (?, ?)', (cafe_id, 1))
+        conn.commit()
     flash('Recommendation settings updated successfully!', 'success')
     return redirect(url_for('admin_recommendation'))
     
 
-def serialize_cafe(cafe):
-    cafe = dict(cafe)
-    if '_id' in cafe and isinstance(cafe['_id'], ObjectId):
-        cafe['_id'] = str(cafe['_id'])
-    normalized_ratings = []
-    for r in cafe.get('ratings', []):
-        if isinstance(r, dict):
-            normalized_ratings.append(r)
-        else:
-            normalized_ratings.append({'user': 'Unknown', 'rating': r, 'timestamp': None})
-    cafe['ratings'] = normalized_ratings
-    normalized_comments = []
-    for c in cafe.get('comments', []):
-        if isinstance(c, dict):
-            normalized_comments.append(c)
-        else:
-            normalized_comments.append({'user': 'Unknown', 'comment': c, 'timestamp': None})
-    cafe['comments'] = normalized_comments
-
-    if 'address' not in cafe:
-        cafe['address'] = ''
-    return cafe
     
 @app.route('/edit_profile', methods=['POST'])
 @login_required
 def edit_profile():
-
-    user = users_col.find_one({'username': session['username']})
-    if not user:
-        flash('User not found.', 'danger')
-        return redirect(url_for('dashboard'))
-
+    username = session['username']
     first_name = request.form.get('first_name')
     last_name = request.form.get('last_name')
     email = request.form.get('email')
@@ -211,67 +247,79 @@ def edit_profile():
     birthday = request.form.get('birthday')
     contactnumber = request.form.get('contactnumber')
 
+    profile_pic_url = None
+    if 'profile_pic' in request.files:
+        file = request.files['profile_pic']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(f"{username}_{file.filename}")
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            profile_pic_url = url_for('static', filename=f'uploads/{filename}')
 
-    profile_pic = request.files.get('profile_pic')
-    profile_pic_url = user.get('profile_pic_url', None)
-    if profile_pic and allowed_file(profile_pic.filename):
-        filename = secure_filename(profile_pic.filename)
-        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        profile_pic.save(image_path)
-        profile_pic_url = url_for('static', filename=f'uploads/{filename}')
-
-    update_fields = {
-        'first_name': first_name,
-        'last_name': last_name,
-        'email': email,
-        'gender': gender,
-        'birthday': birthday,
-        'contactnumber': contactnumber,
-        'profile_pic_url': profile_pic_url
-    }
-
-    update_fields = {k: v for k, v in update_fields.items() if v is not None}
-
-    users_col.update_one({'_id': user['_id']}, {'$set': update_fields})
+    with sqlite3.connect('caferadar.db') as conn:
+        cur = conn.cursor()
+        if profile_pic_url:
+            cur.execute('''
+                UPDATE users
+                SET first_name=?, last_name=?, email=?, gender=?, birthday=?, contactnumber=?, profile_pic_url=?
+                WHERE username=?
+            ''', (first_name, last_name, email, gender, birthday, contactnumber, profile_pic_url, username))
+        else:
+            cur.execute('''
+                UPDATE users
+                SET first_name=?, last_name=?, email=?, gender=?, birthday=?, contactnumber=?
+                WHERE username=?
+            ''', (first_name, last_name, email, gender, birthday, contactnumber, username))
+        conn.commit()
 
     flash('Profile updated successfully!', 'success')
     return redirect(url_for('dashboard'))
 
-
 @app.route('/admin/users', methods=['GET'])
 @admin_required
 def admin_users():
-    all_users = list(users_col.find({}, {'_id': 1, 'username': 1, 'role': 1, 'first_name': 1, 'last_name': 1, 'email': 1, 'gender': 1, 'birthday': 1, 'sex': 1, 'contactnumber': 1}))
+    with sqlite3.connect('caferadar.db') as conn:
+        cur = conn.cursor()
+        cur.execute('SELECT id, username, role, first_name, last_name, email, gender, birthday, contactnumber FROM users')
+        users = [
+            dict(zip(['id', 'username', 'role', 'first_name', 'last_name', 'email', 'gender', 'birthday', 'contactnumber'], row))
+            for row in cur.fetchall()
+        ]
+    return render_template('admin_users.html', users=users)
 
-    for user in all_users:
-        user['_id'] = str(user['_id'])
-    return render_template('admin_users.html', users=all_users)
-
-@app.route('/admin/user/edit/<user_id>', methods=['POST'])
+@app.route('/admin/user/edit/<int:user_id>', methods=['POST'])
 @admin_required
 def edit_user_role(user_id):
     new_role = request.form.get('role')
     if new_role not in ['admin', 'user']:
         flash('Invalid role selected.', 'danger')
         return redirect(url_for('admin_users'))
-    users_col.update_one({'_id': ObjectId(user_id)}, {'$set': {'role': new_role}})
+    with sqlite3.connect('caferadar.db') as conn:
+        cur = conn.cursor()
+        cur.execute('UPDATE users SET role=? WHERE id=?', (new_role, user_id))
+        conn.commit()
     flash('User role updated successfully!', 'success')
     return redirect(url_for('admin_users'))
 
-@app.route('/admin/user/delete/<user_id>', methods=['POST'])
+@app.route('/admin/user/delete/<int:user_id>', methods=['POST'])
 @admin_required
 def delete_user(user_id):
-    users_col.delete_one({'_id': ObjectId(user_id)})
+    with sqlite3.connect('caferadar.db') as conn:
+        cur = conn.cursor()
+        cur.execute('DELETE FROM users WHERE id=?', (user_id,))
+        conn.commit()
     flash('User deleted successfully!', 'danger')
     return redirect(url_for('admin_users'))
 
-@app.route('/admin/user/details/<user_id>', methods=['GET'])
+@app.route('/admin/user/details/<int:user_id>', methods=['GET'])
 @admin_required
 def user_details(user_id):
-    user = users_col.find_one({'_id': ObjectId(user_id)}, {'_id': 0, 'password': 0})
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
+    with sqlite3.connect('caferadar.db') as conn:
+        cur = conn.cursor()
+        cur.execute('SELECT username, role, first_name, last_name, email, gender, birthday, contactnumber FROM users WHERE id=?', (user_id,))
+        row = cur.fetchone()
+        if not row:
+            return jsonify({'error': 'User not found'}), 404
+        user = dict(zip(['username', 'role', 'first_name', 'last_name', 'email', 'gender', 'birthday', 'contactnumber'], row))
     return jsonify(user)
 
 @app.route('/logout')
@@ -286,8 +334,7 @@ def add_cafe():
     name = request.form['name']
     description = request.form['description']
     maps_url = request.form['maps_url']
-    address = request.form.get('address', '').strip()  
-
+    address = request.form.get('address', '').strip()
     image = request.files.get('image')
     image_url = None
     if image and allowed_file(image.filename):
@@ -298,84 +345,73 @@ def add_cafe():
         image_url = url_for('static', filename=f'uploads/{filename}')
     else:
         image_url = url_for('static', filename='default_cafe.jpg')
-
-    cafe = {
-        'name': name,
-        'description': description,
-        'maps_url': maps_url,
-        'address': address,
-        'image_url': image_url,
-        'ratings': [],
-        'comments': []
-    }
-
-    cafes_col.insert_one(cafe)
-
+    with sqlite3.connect('caferadar.db') as conn:
+        cur = conn.cursor()
+        cur.execute('''
+            INSERT INTO cafes (name, description, maps_url, address, image_url)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (name, description, maps_url, address, image_url))
+        conn.commit()
     flash('Cafe added successfully!', 'success')
     return redirect(url_for('dashboard'))
-@app.route('/admin/cafe/delete/<cafe_id>', methods=['POST'])
+
+@app.route('/admin/cafe/edit/<int:cafe_id>', methods=['GET', 'POST'])
+@admin_required
+def edit_cafe(cafe_id):
+    with sqlite3.connect('caferadar.db') as conn:
+        cur = conn.cursor()
+        if request.method == 'POST':
+            name = request.form['name']
+            description = request.form['description']
+            maps_url = request.form['maps_url']
+            address = request.form.get('address', '').strip()
+            image = request.files.get('image')
+            cur.execute('SELECT image_url FROM cafes WHERE id=?', (cafe_id,))
+            image_url = cur.fetchone()[0]
+            if image and image.filename and allowed_file(image.filename):
+                filename = secure_filename(image.filename)
+                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                image.save(image_path)
+                image_url = url_for('static', filename=f'uploads/{filename}')
+            cur.execute('''
+                UPDATE cafes SET name=?, description=?, maps_url=?, address=?, image_url=?
+                WHERE id=?
+            ''', (name, description, maps_url, address, image_url, cafe_id))
+            conn.commit()
+            flash('Cafe updated successfully!', 'success')
+            return redirect(url_for('dashboard'))
+        # GET
+        cur.execute('SELECT * FROM cafes WHERE id=?', (cafe_id,))
+        cafe = cur.fetchone()
+        if not cafe:
+            return "Cafe not found.", 404
+        cafe_dict = dict(zip([column[0] for column in cur.description], cafe))
+    return render_template('edit_cafe.html', cafe=cafe_dict)
+
+@app.route('/admin/cafe/delete/<int:cafe_id>', methods=['POST'])
 @admin_required
 def delete_cafe(cafe_id):
-    cafes_col.delete_one({'_id': ObjectId(cafe_id)})
+    with sqlite3.connect('caferadar.db') as conn:
+        cur = conn.cursor()
+        cur.execute('DELETE FROM cafes WHERE id=?', (cafe_id,))
+        cur.execute('DELETE FROM ratings WHERE cafe_id=?', (cafe_id,))
+        cur.execute('DELETE FROM comments WHERE cafe_id=?', (cafe_id,))
+        cur.execute('DELETE FROM cafe_recommendations WHERE cafe_id=?', (cafe_id,))
+        conn.commit()
     flash('Cafe deleted successfully!', 'danger')
     return redirect(url_for('dashboard'))
 
-@app.route('/admin/cafe/edit/<cafe_id>', methods=['GET', 'POST'])
-@admin_required
-def edit_cafe(cafe_id):
-    cafe = cafes_col.find_one({'_id': ObjectId(cafe_id)})
-    if not cafe:
-        return "Cafe not found.", 404
-
-    if request.method == 'POST':
-        name = request.form['name']
-        description = request.form['description']
-        maps_url = request.form['maps_url']
-        address = request.form.get('address', '').strip() 
-
-
-
-        image = request.files.get('image')
-        image_url = cafe.get('image_url')  
-        if image and image.filename and allowed_file(image.filename):
-            filename = secure_filename(image.filename)
-            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-            image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            image.save(image_path)
-            image_url = url_for('static', filename=f'uploads/{filename}')
-
-        cafes_col.update_one(
-            {'_id': ObjectId(cafe_id)},
-            {'$set': {
-                'name': name,
-                'description': description,
-                'maps_url': maps_url,
-                'address': address,
-                'image_url': image_url
-            }}
-        )
-        flash('Cafe updated successfully!', 'success')
-        return redirect(url_for('dashboard'))
-
-    return render_template('edit_cafe.html', cafe=cafe)
-
-
-
-@app.route('/cafe/rate_and_comment/<cafe_id>', methods=['POST'])
+@app.route('/cafe/rate_and_comment/<int:cafe_id>', methods=['POST'])
 def rate_and_comment_cafe(cafe_id):
     if 'username' not in session:
-
         return redirect(url_for('home', show_sign_in='true'))
-
     rating = request.form.get('rating')
     comment = request.form.get('comment')
     user = session['username']
-
-
     if not rating or not comment or not comment.strip():
         flash('Both rating and comment are required.', 'danger')
         return redirect(url_for('dashboard'))
-
     try:
         rating = int(rating)
         if rating < 1 or rating > 5:
@@ -383,93 +419,48 @@ def rate_and_comment_cafe(cafe_id):
     except ValueError:
         flash('Invalid rating value.', 'danger')
         return redirect(url_for('dashboard'))
-
     timestamp = datetime.utcnow().isoformat()
-
-    rating_obj = {
-        'user': user,
-        'rating': rating,
-        'timestamp': timestamp
-    }
-    comment_obj = {
-        '_id': str(ObjectId()),
-        'user': user,
-        'comment': comment.strip(),
-        'timestamp': timestamp,
-        'rating': rating  
-    }
-
-    cafes_col.update_one(
-    {'_id': ObjectId(cafe_id)},
-    {
-        '$push': {
-            'ratings': rating_obj,
-            'comments': comment_obj
-            }
-        }
-    )
+    with sqlite3.connect('caferadar.db') as conn:
+        cur = conn.cursor()
+        cur.execute('''
+            INSERT INTO ratings (cafe_id, user, rating, timestamp)
+            VALUES (?, ?, ?, ?)
+        ''', (cafe_id, user, rating, timestamp))
+        cur.execute('''
+            INSERT INTO comments (cafe_id, user, comment, timestamp, rating)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (cafe_id, user, comment.strip(), timestamp, rating))
+        conn.commit()
     flash('Thank you for your feedback!', 'success')
     return redirect(url_for('dashboard'))
 
-
-@app.route('/delete_comment/<cafe_id>/<comment_id>', methods=['POST'])
+@app.route('/delete_comment/<int:cafe_id>/<int:comment_id>', methods=['POST'])
 @login_required
 def delete_comment(cafe_id, comment_id):
-    cafe = db.cafes.find_one({'_id': ObjectId(cafe_id)})
-    if not cafe:
-        flash('Cafe not found.', 'danger')
-        return redirect(url_for('dashboard'))
-    
-    comment = next((c for c in cafe['comments'] if c.get('_id') and str(c['_id']) == comment_id), None)
-    if not comment or comment['user'] != session['username']:
-        flash('You can only delete your own comment.', 'danger')
-        return redirect(url_for('dashboard'))
-    db.cafes.update_one(
-        {'_id': ObjectId(cafe_id)},
-        {'$pull': {'comments': {'_id': comment_id}}}
-    )
+    with sqlite3.connect('caferadar.db') as conn:
+        cur = conn.cursor()
+        cur.execute('SELECT user FROM comments WHERE id=? AND cafe_id=?', (comment_id, cafe_id))
+        row = cur.fetchone()
+        if not row:
+            flash('Comment not found.', 'danger')
+            return redirect(url_for('dashboard'))
+        if row[0] != session['username']:
+            flash('You can only delete your own comment.', 'danger')
+            return redirect(url_for('dashboard'))
+        cur.execute('DELETE FROM comments WHERE id=?', (comment_id,))
+        conn.commit()
     flash('Comment deleted.', 'danger')
     return redirect(url_for('dashboard'))
 
-@app.route('/admin_delete_comment/<cafe_id>/<comment_id>', methods=['POST'])
+@app.route('/admin_delete_comment/<int:cafe_id>/<int:comment_id>', methods=['POST'])
+@admin_required
 def admin_delete_comment(cafe_id, comment_id):
-
-    cafe = db.cafes.find_one({'_id': ObjectId(cafe_id)})
-    if not cafe:
-        return jsonify({'success': False, 'msg': 'Cafe not found.'}), 404
-    db.cafes.update_one(
-        {'_id': ObjectId(cafe_id)},
-        {'$pull': {'comments': {'_id': comment_id}}}
-    )
+    with sqlite3.connect('caferadar.db') as conn:
+        cur = conn.cursor()
+        cur.execute('DELETE FROM comments WHERE id=? AND cafe_id=?', (comment_id, cafe_id))
+        conn.commit()
     return jsonify({'success': True})
 
-def normalize_cafe_ratings_comments(cafes):
-    """
-    Ensures all ratings are dicts with keys: user, rating, timestamp.
-    Ensures all comments are dicts with keys: user, comment, timestamp, rating.
-    """
-    for cafe in cafes:
-
-        normalized_ratings = []
-        for r in cafe.get('ratings', []):
-            if isinstance(r, dict):
-                normalized_ratings.append(r)
-            else:
-                normalized_ratings.append({'user': 'Unknown', 'rating': r, 'timestamp': None})
-        cafe['ratings'] = normalized_ratings
-
-
-        normalized_comments = []
-        for c in cafe.get('comments', []):
-            if isinstance(c, dict):
-
-                if 'rating' not in c or c['rating'] is None:
-                    c['rating'] = 0
-                normalized_comments.append(c)
-            else:
-                normalized_comments.append({'user': 'Unknown', 'comment': c, 'timestamp': None, 'rating': 0})
-        cafe['comments'] = normalized_comments
-    return cafes
-
+init_db()
 if __name__ == '__main__':
     app.run(debug=True)

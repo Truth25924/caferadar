@@ -25,7 +25,7 @@
           <h3>{{ cafe.name }}</h3>
           <p>{{ cafe.description }}</p>
           <label class="admin-recommend-checkbox">
-            <input type="checkbox" name="recommended_cafes" value="{{ cafe._id }}" {% if cafe.is_recommended %}checked{% endif %}>
+            <input type="checkbox" name="recommended_cafes" value="{{ cafe.id }}" {% if cafe.is_recommended %}checked{% endif %}>
             Recommended
           </label>
         </div>

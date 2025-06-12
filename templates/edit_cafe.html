@@ -3,7 +3,7 @@
 
 <div class="edit-cafe-form">
   <h2>Edit Cafe Recommendation</h2>
-  <form method="POST" action="{{ url_for('edit_cafe', cafe_id=cafe._id) }}" enctype="multipart/form-data">
+  <form method="POST" action="{{ url_for('edit_cafe', cafe_id=cafe.id) }}" enctype="multipart/form-data">
     <label>
       Cafe Name:
       <input type="text" name="name" value="{{ cafe.name }}" required />

@@ -136,7 +136,7 @@
       <div class="cafe-actions" onclick="event.stopPropagation();">
         <form
           method="POST"
-          action="{{ url_for('delete_cafe', cafe_id=cafe._id) }}"
+          action="{{ url_for('delete_cafe', cafe_id=cafe.id) }}"
           style="display: inline">
           <button
             type="submit"
@@ -147,7 +147,7 @@
         </form>
         <button
         class="btn-approve"
-        onclick="window.location.href='{{ url_for('edit_cafe', cafe_id=cafe._id) }}';">
+        onclick="window.location.href='{{ url_for('edit_cafe', cafe_id=cafe.id) }}';">
         <i class="fa-solid fa-pen-to-square"></i>
         </button>
       </div>
@@ -284,10 +284,10 @@
         }
 
         let deleteBtn = '';
-          if (c._id && cafe._id) {
+          if (c._id && cafe.id) {
             deleteBtn = `
               <button class="admin-delete-comment-btn" title="Delete comment"
-                onclick="adminDeleteComment('${cafe._id}', '${c._id}', this)">
+                onclick="adminDeleteComment('${cafe.id}', '${c.id}', this)">
                 <i class="fa-solid fa-trash"></i>
               </button>
             `;

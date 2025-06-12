@@ -30,7 +30,7 @@
     </ul>
     <div class="navbar-profile-group">
         <div class="navbar-profile" onclick="openProfileModal()">
-            <img src="{{ user.profile_pic_url if user.profile_pic_url else url_for('static', filename='default_profile.png') }}" alt="Profile Picture" class="profile-pic">
+            <img src="{{ (user.profile_pic_url if user.profile_pic_url else url_for('static', filename='default_profile.png')) }}?v={{ range(10000)|random }}" alt="Profile Picture" class="profile-pic">
             <span>{{ user.username|capitalize }}</span>
         </div>
         <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
@@ -330,7 +330,7 @@
                 document.getElementById('modalCafeName').textContent = cafe.name;
                 document.getElementById('modalCafeDesc').textContent = cafe.description;
 
-                document.getElementById('modalRateCommentForm').action = `/cafe/rate_and_comment/${cafe._id}`;
+                document.getElementById('modalRateCommentForm').action = `/cafe/rate_and_comment/${cafe.id}`;
 
                 let ratingHtml = '';
                 let ratings = cafe.ratings || [];
@@ -359,9 +359,9 @@
                         }
 
                         let deleteBtn = '';
-                        if (c.user === currentUsername && c._id) {
+                        if (c.user === currentUsername && c.id) {
                             deleteBtn = `
-                                <form method="POST" action="/delete_comment/${cafe._id}/${c._id}" style="display:inline;">
+                                <form method="POST" action="/delete_comment/${cafe.id}/${c.id}" style="display:inline;">
                                     <button type="submit" class="delete-comment-btn" title="Delete comment" onclick="return confirm('Delete this comment?')">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
