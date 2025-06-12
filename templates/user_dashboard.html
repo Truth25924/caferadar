@@ -11,12 +11,18 @@
 <body>
     <!-- Navigation Bar -->
     <header class="navbar">
-    <a href="{{ url_for('home') }}" style="text-decoration: none;">
+    <a href="{{ url_for('home') }}" style="text-decoration: none; display: flex; align-items: center;">
         <h2 style="display: flex; align-items: center; gap: 0.3rem; margin: 0;">
             CafeRadar
             <span class="material-icons" style="vertical-align: middle; font-size: 28px; margin-right: 6px;">coffee</span>
         </h2>
+        <button id="search-toggle" class="search-icon-btn" type="button" title="Search">
+            <i class="fa fa-search"></i>
+        </button>
     </a>
+    <form id="navbar-search-form" class="navbar-search-form" style="display:none;">
+        <input type="text" id="navbar-search-input" placeholder="Search cafes..." autocomplete="off" />
+    </form>
     <div class="navbar-spacer"></div>
     <ul class="navbar-links">
         <li><a href="#cafes">Cafes</a></li>
@@ -270,6 +276,48 @@
                 const options = { year: 'numeric', month: 'short', day: 'numeric' };
                 return date.toLocaleDateString(undefined, options);
             }
+
+            const searchToggle = document.getElementById('search-toggle');
+            const searchForm = document.getElementById('navbar-search-form');
+            const searchInput = document.getElementById('navbar-search-input');
+            const cafeCards = document.querySelectorAll('.cafe-card');
+
+            // Show/hide search bar
+            searchToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (searchForm.style.display === 'flex') {
+                    searchForm.style.display = 'none';
+                    searchInput.value = '';
+                    cafeCards.forEach(card => card.style.display = '');
+                } else {
+                    searchForm.style.display = 'flex';
+                    searchInput.focus();
+                }
+            });
+
+            // Filter cafes as you type
+            searchInput.addEventListener('input', function() {
+                const query = searchInput.value.trim().toLowerCase();
+                cafeCards.forEach(card => {
+                    const name = card.querySelector('h3')?.textContent.toLowerCase() || '';
+                    if (name.includes(query)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+
+            // Hide search bar on Escape
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    searchForm.style.display = 'none';
+                    searchInput.value = '';
+                    cafeCards.forEach(card => card.style.display = '');
+                }
+            });
+
+
 
             const cafes = {{ cafes|tojson|safe }};
             function openCafeModal(idx) {

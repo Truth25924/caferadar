@@ -124,6 +124,45 @@ body {
   gap: 1rem;
 }
 
+.search-icon-btn {
+  background: none;
+  border: none;
+  color: var(--brown2);
+  font-size: 1.5rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  transition: color 0.18s;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon-btn:hover,
+.search-icon-btn:focus {
+  color: var(--primary-dark);
+}
+
+.navbar-search-form {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+}
+
+#navbar-search-input {
+  padding: 0.4em 1em;
+  font-size: 1.1em;
+  border: 1.5px solid var(--brown2);
+  border-radius: 6px;
+  outline: none;
+  background: var(--brown1);
+  color: #222;
+  margin-left: 0.5rem;
+  min-width: 180px;
+  transition: border 0.18s;
+}
+#navbar-search-input:focus {
+  border-color: var(--primary-dark);
+}
+
 /* Dashboard Container */
 .dashboard-container {
   display: flex;
@@ -280,7 +319,7 @@ section h2 {
 .cafe-comments {
   margin-top: 0.5rem;
   font-size: 0.98rem;
-  color: black;
+  color: white;
   min-height: 3.8em;
   height: 6em;
   display: flex;
@@ -550,6 +589,7 @@ section h2 {
   flex-direction: column;
   justify-content: flex-start;
   width: 88%;
+  color: black;
 }
 .cafe-modal-details .cafe-comments > strong {
   margin-bottom: 0.7em;
@@ -571,7 +611,7 @@ section h2 {
   flex-direction: column;
   gap: 1.1em;
   scrollbar-width: thin;
-  scrollbar-color: var(--brown1) #e5e7eb;
+  scrollbar-color: var(--black) #e5e7eb;
 }
 
 .cafe-modal-details #modalCafeComments li {
@@ -596,7 +636,7 @@ section h2 {
   filter: drop-shadow(0 1px 2px #ffe06655);
 }
 .cafe-modal-details #modalCafeComments .comment-text {
-  color: grey;
+  color: black;
   font-style: italic;
   font-size: 1em;
   max-width: 100%;
@@ -606,7 +646,7 @@ section h2 {
   margin-bottom: 0.2em;
 }
 .cafe-modal-details #modalCafeComments .comment-meta {
-  color: #888;
+  color: black;
   font-style: normal;
   font-size: 0.97em;
   margin-top: 0.1em;
@@ -622,7 +662,7 @@ section h2 {
   color: var(--brown2);
 }
 .cafe-modal-details #modalCafeComments .comment-date {
-  color: #888;
+  color: black;
   font-size: 0.95em;
 }
 .cafe-modal-details #modalCafeComments:empty::before {
@@ -631,7 +671,7 @@ section h2 {
   min-height: 7em;
   line-height: 7em;
   text-align: center;
-  color: #888;
+  color: black;
   font-style: italic;
   font-size: 1.05em;
   width: 100%;

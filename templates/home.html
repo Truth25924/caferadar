@@ -17,6 +17,13 @@
                     <span class="material-icons" style="vertical-align: middle; font-size: 28px; margin-right: 6px;">coffee</span>
                 </h2>
             </a>
+                <button id="search-toggle" class="search-icon-btn" type="button" title="Search">
+                    <i class="fa fa-search"></i>
+                </button>
+            </a>
+                <form id="navbar-search-form" class="navbar-search-form" style="display:none;">
+        <input type="text" id="navbar-search-input" placeholder="Search cafes..." autocomplete="off" />
+    </form>
             <ul class="navbar-links">
                 <li><a href="#cafes">Cafes</a></li>
                 <li><a href="#recommended">Recommended</a></li>
@@ -117,8 +124,8 @@
                     <div class="cafe-info">
                         <div class="cafe-card-header">
                             <h3>{{ cafe.name }}</h3>
-                            <button class="cafe-options-btn" title="View Details" onclick="openCafeModal({{ loop.index0 }})">
-                                <i class="fa-solid fa-ellipsis"></i>
+                            <button class="cafe-options-btn" title="View Details" onclick="openCafeModal({{ cafes.index(cafe) }})">
+                            <i class="fa-solid fa-ellipsis"></i>
                             </button>
                         </div>
                         <p>{{ cafe.description }}</p>
@@ -252,8 +259,10 @@
     </div>
 
     <script>
-console.log("cafes variable:", cafes);
-(function () {
+    const cafes = {{ cafes|tojson|safe }};
+    console.log("cafes variable:", cafes);
+
+    (function () {
     // Handle rate and comment form submission for guests
     function handleRateCommentSubmit(event) {
         var user = {{ 'true' if session.get('username') else 'false' }};
@@ -275,20 +284,142 @@ console.log("cafes variable:", cafes);
         }
         return true;
     }
+    
+    function openCafeModal(idx) {
+    const cafe = cafes[idx];
+    document.getElementById('modalCafeImg').src = cafe.image_url || "{{ url_for('static', filename='default_cafe.jpg') }}";
+    // Address
+    let addressHtml = '';
+    if (cafe.address) {
+        addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>${cafe.address}</span>`;
+    } else {
+        addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>No address provided</span>`;
+    }
+    document.getElementById('modalCafeAddress').innerHTML = addressHtml;
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('modalCafeName').textContent = cafe.name;
+    document.getElementById('modalCafeDesc').textContent = cafe.description || '';
+
+    // Rating
+    let ratingHtml = '';
+    let ratings = cafe.ratings || [];
+    let ratingSum = ratings.reduce((a, b) => a + (b.rating || 0), 0);
+    let ratingCount = ratings.length;
+    let avgRating = ratingCount ? ratingSum / ratingCount : 0;
+    for (let i = 1; i <= 5; i++) {
+        ratingHtml += i <= avgRating
+            ? '<i class="fa-solid fa-star" style="color:#ffd700"></i>'
+            : '<i class="fa-regular fa-star" style="color:#ffd700"></i>';
+    }
+    ratingHtml += `<span class="rating-number">${avgRating.toFixed(1)} / 5 (${ratingCount})</span>`;
+    document.getElementById('modalCafeRating').innerHTML = ratingHtml;
+
+    // Location
+    document.getElementById('modalCafeLocation').innerHTML = cafe.maps_url
+        ? `<a href="${cafe.maps_url}" target="_blank" class="cafe-location"><i class="fa-solid fa-location-dot"></i> View on Maps</a>`
+        : '';
+
+    // Comments (view only)
+    let commentsHtml = '';
+    if (cafe.comments && cafe.comments.length > 0) {
+        cafe.comments.forEach(c => {
+            let stars = '';
+            let commentRating = c.rating !== undefined && c.rating !== null ? c.rating : 0;
+            for (let i = 1; i <= 5; i++) {
+                stars += i <= commentRating
+                    ? '<i class="fa-solid fa-star"></i>'
+                    : '<i class="fa-regular fa-star"></i>';
+            }
+            commentsHtml += `<li>
+                <span class="comment-stars">${stars}</span>
+                <span class="comment-text">"${c.comment}"</span>
+                <span class="comment-meta">
+                    <span class="comment-user">${c.user}</span>
+                    ${c.timestamp ? `<span class="comment-date">${formatDate(c.timestamp)}</span>` : ''}
+                </span>
+            </li>`;
+        });
+    } else {
+        commentsHtml = '<li><em>No comments yet.</em></li>';
+    }
+    document.getElementById('modalCafeComments').innerHTML = commentsHtml;
+
+    document.getElementById('cafeModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    }
+
+    function closeCafeModal() {
+                document.getElementById('cafeModal').style.display = 'none';
+                document.body.style.overflow = '';
+            }
+
+            window.openCafeModal = openCafeModal;
+            window.closeCafeModal = closeCafeModal;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchToggle = document.getElementById('search-toggle');
+        const searchForm = document.getElementById('navbar-search-form');
+        const searchInput = document.getElementById('navbar-search-input');
+        const cafeCards = document.querySelectorAll('.cafe-card');
+
+        // Show/hide search bar
+        searchToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (searchForm.style.display === 'flex') {
+            searchForm.style.display = 'none';
+            searchInput.value = '';
+            cafeCards.forEach(card => card.style.display = '');
+        } else {
+            searchForm.style.display = 'flex';
+            searchInput.focus();
+        }
+    });
+
+    // Filter cafes as you type
+        searchInput.addEventListener('input', function() {
+            const query = searchInput.value.trim().toLowerCase();
+            cafeCards.forEach(card => {
+                const name = card.querySelector('h3')?.textContent.toLowerCase() || '';
+            if (name.includes(query)) {
+                    card.style.display = '';
+            } else {
+                    card.style.display = 'none';
+            }
+        });
+    });
+
+    // Hide search bar on Escape
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            searchForm.style.display = 'none';
+            searchInput.value = '';
+            cafeCards.forEach(card => card.style.display = '');
+        }
+        });
+    });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
         // Attach submit handler to all rate-comment forms
         const rateForms = document.querySelectorAll('.rate-comment-form');
         rateForms.forEach(form => {
             form.addEventListener('submit', handleRateCommentSubmit);
         });
 
+            window.onclick = function(event) {
+                const modal = document.getElementById('cafeModal');
+                if (event.target == modal) {
+                    closeCafeModal();
+                }
+            }
+
+    
         // Sign In / Sign Up modal toggle scripts
         const signInBtn = document.getElementById('sign-in-btn');
         const signUpBtn = document.getElementById('sign-up-btn');
         const signInCard = document.getElementById('sign-in-card');
         const signUpCard = document.getElementById('sign-up-card');
-
+        
         // Create overlay div
         let overlay = document.querySelector('.overlay');
         if (!overlay) {

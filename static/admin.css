@@ -2,25 +2,23 @@
 
 /* Root variables */
 :root {
-  --blue: #2563eb;
-  --white: #fff;
-  --gray: #f5f5f5;
-  --black: #222;
-  --black2: #999;
-  --primary: #2563eb;
-  --primary-dark: #1e40af;
-  --secondary: #f3f4f6;
-  --background: #f9fafb;
-  --gray-light: #e5e7eb;
-  --danger: #ef4444;
-  --success: #22c55e;
+  --brown1: #d6c0b3;
+  --brown2: #ab886d;
+  --white: #e4e0e1;
+  --primary-dark: #493628;
+  --gradient1: linear-gradient(to right, var(--brown1), var(--primary-dark));
+  --gradient2: linear-gradient();
   --border-radius: 12px;
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --font-family: "Ubuntu", "Segoe UI", "Roboto", Arial, sans-serif;
+  --transition: 0.18s cubic-bezier(.4,2,.6,1);
+  --navbar-height: 64px;
 }
+
 
 /* Reset and base styles */
 * {
-  font-family: "Ubuntu", "Segoe UI", "Roboto", Arial, sans-serif;
+  font-family: var(--font-family);
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -28,10 +26,15 @@
 }
 
 body {
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  color: #222;
   min-height: 100vh;
-  background: var(--background);
-  color: var(--black);
-  overflow-x: hidden;
+  background: linear-gradient(rgba(0,0,0,0.4)), url("/static/uploads/homepic.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  padding: 0;
 }
 
 /* Sidebar Navigation */
@@ -39,7 +42,7 @@ body {
   position: fixed !important;
   width: 260px;
   height: 100%;
-  background: var(--blue);
+  background: rgba(56, 55, 55, 0.6);
   left: 0;
   top: 0;
   z-index: 100;
@@ -96,7 +99,7 @@ body {
 
 .navigation ul li.active a,
 .navigation ul li:hover a {
-  color: var(--blue);
+  color: var(--primary-dark);
 }
 
 .navigation ul li a .icon {
@@ -141,7 +144,7 @@ body {
 /* Main Content */
 .main {
   margin-left: 260px;
-  padding: 2.5rem 2.5rem 2.5rem 2.5rem;
+  padding: 2.5rem 2.5rem 0 2.5rem;
   min-height: 100vh;
   background: var(--background);
   transition: margin-left 0.3s;
@@ -280,12 +283,12 @@ body {
 .add-cafe-form textarea {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid var(--gray-light);
+  border: 1px solid var(--primary-dark);
   border-radius: 6px;
   margin-top: 0.2rem;
   margin-bottom: 0.7rem;
   font-size: 1rem;
-  background: var(--secondary);
+  background: var(--white);
   color: #222;
   resize: vertical;
   transition: border 0.2s;
@@ -295,14 +298,14 @@ body {
 .add-cafe-form input:focus,
 .add-cafe-form textarea:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: var(--primary-dark);
 }
 
 .add-cafe-form button,
 .add-cafe-form input[type="submit"] {
   align-self: stretch;
   margin-top: 0.5rem;
-  background: var(--primary);
+  background: var(--brown2);
   color: var(--white);
   border: none;
   border-radius: 6px;
@@ -501,14 +504,15 @@ body {
 
 /* Footer */
 footer {
-  background: var(--white);
-  color: var(--black2);
+  background: #383737; /* Remove transparency */
+  color: var(--white);
   text-align: center;
   padding: 1rem 0;
   font-size: 1rem;
   margin-top: auto;
   letter-spacing: 1px;
   border-top: 1px solid var(--gray-light);
+  width: 100%;
 }
 
 /* ----- MODAL STYLES FOR WHEN CLICKING THE CAFE TO ENLARGE DETAILS DO NOT CHANGE ----- */
@@ -812,7 +816,7 @@ footer {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  border: 1px solid var(--gray-light);
+  border: 1px solid var(--brown2);
 }
 
 .edit-cafe-form h2 {
@@ -828,7 +832,7 @@ footer {
   display: flex;
   flex-direction: column;
   margin-bottom: 0.7rem;
-  color: var(--black2);
+  color: var(--primary-dark);
   font-weight: 500;
   width: 100%;
   font-size: 1rem;
@@ -838,12 +842,12 @@ footer {
 .edit-cafe-form textarea {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid var(--gray-light);
+  border: 1px solid var(--brown2);
   border-radius: 6px;
   margin-top: 0.2rem;
   margin-bottom: 0.7rem;
   font-size: 1rem;
-  background: var(--secondary);
+  background: var(--brown1);
   color: #222;
   resize: vertical;
   transition: border 0.2s;
@@ -853,7 +857,7 @@ footer {
 .edit-cafe-form input:focus,
 .edit-cafe-form textarea:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: var(--primary-dark);
   background: var(--white);
 }
 
@@ -861,7 +865,7 @@ footer {
 .edit-cafe-form input[type="submit"] {
   align-self: stretch;
   margin-top: 0.5rem;
-  background: var(--primary);
+  background: var(--primary-dark);
   color: var(--white);
   border: none;
   border-radius: 6px;
@@ -882,8 +886,8 @@ footer {
 .edit-cafe-form a {
   display: inline-block;
   margin-top: 0.7rem;
-  color: var(--primary);
-  background: var(--secondary);
+  color: var(--brown2);
+  background: var(--brown1);
   border-radius: 6px;
   padding: 0.5rem 1.2rem;
   text-decoration: none;
@@ -937,8 +941,8 @@ footer {
 }
 .alert-info {
   background: #eaf6ff;
-  color: #2563eb;
-  border-color: #2563eb;
+  color: var(--brown1);
+  border-color: var(--brown1);
 }
 
 /* --- User List Styles for Admin Panel --- */
@@ -998,7 +1002,7 @@ footer {
   background: #b91c1c;
 }
 .details-btn {
-  background: #3b82f6;
+  background: var(--brown1);
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -1009,7 +1013,7 @@ footer {
   transition: background 0.18s;
 }
 .details-btn:hover {
-  background: #2563eb;
+  background: var(--brown1);
 }
 .modal {
   display: none;
@@ -1053,4 +1057,90 @@ footer {
     width: 100%;
     justify-content: flex-start;
   }
+}
+
+.h1 {
+  color: var(--brown2);
+}
+
+.admin-cafe-list-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  justify-content: flex-start;
+}
+.admin-cafe-card {
+  background: var(--white, #fff);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  min-width: 220px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  transition: box-shadow 0.2s, transform 0.18s;
+  align-items: center;
+  padding-bottom: 1rem;
+}
+.admin-cafe-card:hover {
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.13);
+  transform: translateY(-2px) scale(1.01);
+}
+.admin-cafe-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background: #f5f5f5;
+  display: block;
+}
+.admin-cafe-info {
+  padding: 1rem 1.2rem 0.5rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+.admin-cafe-info h3 {
+  margin: 0 0 0.3rem 0;
+  font-size: 1.2rem;
+  color: var(--primary-dark, #493628);
+  font-weight: 600;
+}
+.admin-cafe-info p {
+  font-size: 1rem;
+  color: #444;
+  margin-bottom: 0.5rem;
+}
+.admin-recommend-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+.save-btn {
+  background: #009e60;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.7rem 2.2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 1.5rem auto 0 auto;
+  display: block;
+  box-shadow: 0 2px 8px rgba(0,158,96,0.08);
+  transition: background 0.18s, box-shadow 0.18s, transform 0.14s;
+}
+
+.save-btn:hover,
+.save-btn:focus {
+  background: #00794a;
+  box-shadow: 0 4px 16px rgba(0,158,96,0.16);
+  transform: translateY(-2px) scale(1.03);
+  outline: none;
 }
