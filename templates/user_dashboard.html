@@ -9,91 +9,22 @@
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar">
-        <ul class="navbar-links">
-            <li><a href="#cafes">Cafes</a></li>
-            <li><a href="#recommended">Recommended</a></li>
-        </ul>
-        <div class="navbar-profile-group">
-            <div class="navbar-profile" onclick="openProfileModal()">
-                <img src="{{ user.profile_pic_url if user.profile_pic_url else url_for('static', filename='default_profile.png') }}" alt="Profile Picture" class="profile-pic">
-                <span>{{ user.username|capitalize }}</span>
-            </div>
-            <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
-                <i class="fa-solid fa-right-from-bracket"></i>
-            </a>
+    <header class="navbar">
+    <div class="navbar-spacer"></div>
+    <ul class="navbar-links">
+        <li><a href="#cafes">Cafes</a></li>
+        <li><a href="#recommended">Recommended</a></li>
+    </ul>
+    <div class="navbar-profile-group">
+        <div class="navbar-profile" onclick="openProfileModal()">
+            <img src="{{ user.profile_pic_url if user.profile_pic_url else url_for('static', filename='default_profile.png') }}" alt="Profile Picture" class="profile-pic">
+            <span>{{ user.username|capitalize }}</span>
         </div>
-        <div class="top-navbarbtn">
-            <button id="sign-in-btn">Sign In</button>
-            <button id="sign-up-btn">Sign Up</button>
-        </div>
-    </nav>
-
-    <div class="card-container" id="sign-in-card" style="display:none;">
-        <h2>Sign In</h2>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div class="flashes">
-              {% for category, message in messages %}
-                {% if category == 'error' %}
-                  <div class="alert alert-error">
-                    {{ message }}
-                  </div>
-                {% endif %}
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-        <form method="POST" action="/login">
-          <label for="username">Username</label>
-          <input type="text" id="username" name="username" required />
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" required />
-          <button type="submit" class="submit-btn">Login</button>
-        </form>
-        <p style="margin-top: 10px;">Don't have an account? <span id="show-sign-up" style="color: blue; cursor: pointer; text-decoration: underline;">Sign Up</span></p>
+        <a href="{{ url_for('logout') }}" class="logout-btn" title="Logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </a>
     </div>
-
-    <div class="card-container" id="sign-up-card" style="display:none;">
-        <h2>Sign Up</h2>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div class="flashes">
-              {% for category, message in messages %}
-                {% if category == 'success' %}
-                  <div class="alert alert-success">
-                    {{ message }}
-                  </div>
-                {% endif %}
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-        <form method="POST" action="/register">
-          <label for="reg-username">Username</label>
-          <input type="text" id="reg-username" name="username" required />
-          <label for="reg-password">Password</label>
-          <input type="password" id="reg-password" name="password" required />
-          <label for="first_name">First Name</label>
-          <input type="text" id="first_name" name="first_name" required />
-          <label for="last_name">Last Name</label>
-          <input type="text" id="last_name" name="last_name" required />
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required />
-          <label for="gender">Gender</label>
-          <select id="gender" name="gender" required>
-            <option value="">Select</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-          <label for="birthday">Birthday</label>
-          <input type="date" id="birthday" name="birthday" required />
-          <button type="submit" class="submit-btn">Register</button>
-        </form>
-        <p style="margin-top: 10px;">Already have an account? <span id="show-sign-in" style="color: blue; cursor: pointer; text-decoration: underline;">Sign In</span></p>
-    </div>
-
+</header>
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
@@ -118,8 +49,8 @@
                     <div class="cafe-info">
                         <div class="cafe-card-header">
                             <h3>{{ cafe.name }}</h3>
-                            <button class="cafe-options-btn" title="View Details" onclick="openCafeModal({ loop,index0 })">
-                                <i class="fa-solid fa-ellipsis"></i>
+                            <button class="cafe-options-btn" title="View Details" onclick="openCafeModal({{ loop.index0 }})">
+                            <i class="fa-solid fa-ellipsis"></i>
                             </button>
                         </div>
                         <p class="cafe-Desc">{{ cafe.description }}</p>
@@ -168,16 +99,17 @@
                         <!-- Combined Rate and Comment Form -->
                         <form method="POST" action="{{ url_for('rate_and_comment_cafe', cafe_id=cafe._id) }}" class="rate-comment-form">
                             <label>
-                                Rate:
-                                <select name="rating" required>
-                                    <option value="">--</option>
-                                    {% for i in range(1, 6) %}
-                                    <option value="{{ i }}">{{ i }}</option>
-                                    {% endfor %}
-                                </select>
-                            </label>
-                            <input type="text" name="comment" placeholder="Leave a comment..." required>
-                            <button type="submit">Submit</button>
+                            Rate:
+                            <span class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars"></label>
+                            <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars"></label>
+                            <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars"></label>
+                            <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars"></label>
+                            <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star"></label>
+                            </span>
+                        </label>
+                        <input type="text" name="comment" placeholder="Leave a comment..." required />
+                        <button type="submit">Submit</button>
                         </form>
                     </div>
                 </div>
@@ -326,7 +258,7 @@
                 return date.toLocaleDateString(undefined, options);
             }
 
-            const cafes = { cafes , tojson , safe };
+            const cafes = {{ cafes|tojson|safe }};
             function openCafeModal(idx) {
                 const cafe = cafes[idx];
                 document.getElementById('modalCafeImg').src = cafe.image_url || "{{ url_for('static', filename='default_cafe.jpg') }}";
@@ -426,6 +358,10 @@
                 document.getElementById('cafeModal').style.display = 'none';
                 document.body.style.overflow = '';
             }
+
+            window.openCafeModal = openCafeModal;
+            window.closeCafeModal = closeCafeModal;
+
             window.onclick = function(event) {
                 const modal = document.getElementById('cafeModal');
                 if (event.target == modal) {
@@ -480,8 +416,8 @@
 
             // Show sign-in card and overlay if error exists
             if (document.body.dataset.loginError === "true") {
-                window.addEventListener('DOMContentLoaded', (event) => {
-                    showCard(signInCard);
+                window.addEventLitener('DOMContentLoaded', (event) => {
+                    showCard(signIsnCard);
                 });
             }
 

@@ -57,7 +57,8 @@ def home():
         return redirect('/dashboard')
     cafes = [serialize_cafe(cafe) for cafe in cafes_col.find()]
     cafes = normalize_cafe_ratings_comments(cafes)
-    return render_template('home.html', cafes=cafes)
+    show_sign_in = request.args.get('show_sign_in', 'false').lower() == 'true'
+    return render_template('home.html', cafes=cafes, show_sign_in=show_sign_in)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -352,8 +353,11 @@ def edit_cafe(cafe_id):
 # ----------- Rate and Comment -----------
 
 @app.route('/cafe/rate_and_comment/<cafe_id>', methods=['POST'])
-@login_required
 def rate_and_comment_cafe(cafe_id):
+    if 'username' not in session:
+        # Redirect back to home with flag to show sign-in modal
+        return redirect(url_for('home', show_sign_in='true'))
+
     rating = request.form.get('rating')
     comment = request.form.get('comment')
     user = session['username']

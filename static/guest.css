@@ -1,3 +1,5 @@
+/* Pruned CSS for guest.css based on selectors used in templates/home.html */
+
 code* {
   margin: 0;
   padding: 0;
@@ -11,14 +13,12 @@ code* {
   --white: #e4e0e1;
   --primary-dark: #493628;
   --gradient1: linear-gradient(to right, var(--brown1), var(--primary-dark));
-  --gradient2: linear-gradient();
   --border-radius: 12px;
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   --font-family: "Ubuntu", "Segoe UI", "Roboto", Arial, sans-serif;
   --transition: 0.18s cubic-bezier(.4,2,.6,1);
   --navbar-height: 64px;
 }
-
 
 body {
   font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
@@ -32,13 +32,12 @@ body {
   padding: 2rem;
 }
 
-
 /* Navbar */
 .navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(56, 55, 55, 0.5);
+  background: rgba(56, 55, 55, 0.7);
   height: var(--navbar-height);
   box-shadow: 0 4px 16px rgba(0, 177, 79, 0.10);
   position: fixed;
@@ -48,25 +47,31 @@ body {
   z-index: 100;
   width: 100%;
   margin: 0;
-  padding: 0 2rem;
 }
 
-.navbar-spacer {
-  flex: 1 1 0;
+#sign-in-btn,
+#sign-up-btn {
+  background: none;
+  border: none;
+  color: var(--brown2);
+  font-size: 1.2rem;
+  margin: 12px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-weight: 500;
+  padding: 0;
+  text-decoration: none;
+}
+
+#sign-in-btn:hover,
+#sign-up-btn:hover {
+  color: var(--brown1);
 }
 
 .navbar-links {
+  list-style: none;
   display: flex;
   gap: 3rem;
-  justify-content: center;
-  align-items: center;
-  flex: 0 1 auto;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
 }
 
 .navbar-links li a {
@@ -85,85 +90,39 @@ body {
 .navbar-profile-group {
   display: flex;
   align-items: center;
-  gap: 1.8rem;
-  flex: 1 1 0;
-  justify-content: flex-end;
+  gap: 1.2rem;
 }
 
-.navbar-profile {
+.navbarbtn {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  cursor: pointer;
-  padding: 0.3rem 0.7rem;
-  border-radius: 999px;
-  transition: background var(--transition);
-}
-.navbar-profile:hover {
-  background: var(--primary-dark);
-}
-
-.profile-pic {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--brown2);
-  background: var(--brown1);
-  
-}
-
-.navbar-profile span{
-  color: var(--brown2);
-  font-size: 1.1rem;
-  font-weight: 500;
-}
-
-.logout-btn {
-  color: var(--brown2);
-  background: none;
-  border: none;
-  font-size: 1.6rem;
-  cursor: pointer;
-  transition: color var(--transition);
-  padding: 0 3rem;
-  text-decoration: none;
-}
-.logout-btn:hover {
-  color: #b91c1c;
+  gap: 1rem;
 }
 
 /* Dashboard Container */
 .dashboard-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;       /* Center children horizontally */
-  width: 100%;
+  max-width: 1200px;
+  margin: 3rem auto 0 auto;
 }
 
 /* Section Titles */
 section h2 {
-  color: var(--brown2);
-  padding: 2rem;
+  color: var(--primary-dark);
   margin-bottom: 1.2rem;
   font-size: 2rem;
   font-weight: 700;
-  margin-left: 2.8rem;
 }
 
 /* Cafe List & Cards */
 .cafe-list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;   /* Center cards horizontally */
-  gap: 2rem;                 /* Space between cards */
-  margin: 2rem auto 0 auto;  /* Center the container itself */
-  max-width: 1200px;         /* Optional: limit width for nice centering */
-  padding: 0 1rem;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .cafe-card {
-  background: linear-gradient(135deg, #fff 80%, #e5f9ee 100%);
+  background: rgba(56, 55, 55, 0.4);
   border: none;
   box-shadow: 0 4px 24px rgba(0, 177, 79, 0.13), 0 1.5px 0 0 #e5e7eb;
   width: 340px;
@@ -173,13 +132,52 @@ section h2 {
   transition: box-shadow 0.22s, transform 0.22s;
   border-radius: 18px;
 }
-.cafe-card.recommended {
-  border: 2.5px solid var(--primary);
-  box-shadow: 0 4px 16px var(--brown1);
-}
+
 .cafe-card:hover {
-  box-shadow: 0 8px 32px var(--brown2, rgba(73, 54, 40, 0.18)), 0 2px 0 0 var(--brown2, #493628);
+  box-shadow: 0 8px 32px rgba(0, 143, 58, 0.18), 0 2px 0 0 #008f3a;
   transform: translateY(-6px) scale(1.025);
+}
+
+.cafe-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  margin-bottom: 0.1em;
+}
+
+.cafe-card-header h3 {
+  font-size: 1.08rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1 1 auto;
+}
+
+/* 3-dots button style */
+.cafe-options-btn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.3em;
+  cursor: pointer;
+  padding: 0.1em 0.4em;
+  border-radius: 50%;
+  transition: background 0.15s, color 0.15s;
+  margin-left: 0.5em;
+  align-self: flex-start;
+  line-height: 1;
+  height: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cafe-options-btn:hover,
+.cafe-options-btn:focus {
+  color: var(--primary-dark);
 }
 
 .cafe-img {
@@ -227,9 +225,11 @@ section h2 {
   gap: 0.4rem;
   transition: color var(--transition);
 }
+
 .cafe-location:hover {
   color: var(--brown2);
 }
+
 .cafe-rating {
   display: flex;
   align-items: center;
@@ -237,9 +237,10 @@ section h2 {
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
 }
+
 .rating-number {
   margin-left: 0.6rem;
-  color: #fff;
+  color: var(--brown1);
   font-size: 0.98rem;
 }
 
@@ -255,6 +256,7 @@ section h2 {
   justify-content: flex-start;
   position: relative;
 }
+
 .cafe-comments .comment-preview {
   display: flex;
   flex-direction: column;
@@ -269,17 +271,20 @@ section h2 {
   box-shadow: 0 2px 8px rgba(0, 177, 79, 0.08);
   border: 1px solid var(--gray);
 }
+
 .cafe-comments .comment-stars {
   margin-bottom: 0.3em;
   display: flex;
   flex-direction: row;
   gap: 0.08em;
 }
+
 .cafe-comments .comment-stars i {
   color: #ffd700;
   font-size: 1.08em;
   vertical-align: middle;
 }
+
 .cafe-comments .comment-text {
   font-style: italic;
   font-size: 1em;
@@ -289,6 +294,7 @@ section h2 {
   white-space: nowrap;
   margin-bottom: 0.2em;
 }
+
 .cafe-comments .comment-user {
   color: var(--white);
   font-style: normal;
@@ -299,11 +305,13 @@ section h2 {
   overflow: visible;
   text-overflow: unset;
 }
+
 .cafe-comments ul {
   margin: 0.3rem 0 0 1.2rem;
   padding: 0;
   list-style: disc;
 }
+
 .cafe-comments li {
   margin-bottom: 0.2rem;
 }
@@ -340,8 +348,7 @@ section h2 {
 .star-rating {
   direction: rtl;
   display: inline-flex;
-  font-size: 1.3em;
-  gap: 5px;
+  font-size: 1.7em;
   unicode-bidi: bidi-override;
   position: relative;
   vertical-align: middle;
@@ -377,17 +384,14 @@ section h2 {
   overflow: visible;
 }
 
-.star-rating label:hover,
-.star-rating label:hover ~ label,
-.star-rating input[type="radio"]:checked ~ label {
-  color: #ffd700;
-}
-.star-rating label:hover:before,
+/* Fill stars on hover or checked */
+.star-rating input[type="radio"]:checked ~ label:before,
 .star-rating label:hover ~ label:before,
-.star-rating input[type="radio"]:checked ~ label:before {
+.star-rating label:hover:before {
   color: #ffd700;
   -webkit-text-stroke: 0px #ffd700;
 }
+
 
 .rate-comment-form input[type="text"] {
   border: 1.5px solid var(--gray);
@@ -405,7 +409,7 @@ section h2 {
 }
 .rate-comment-form button[type="submit"] {
   margin-top: 0.5em;
-  background: var(--primary);
+  background: var(--brown1);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -414,7 +418,7 @@ section h2 {
   font-weight: 600;
   cursor: pointer;
   transition: background 0.18s, box-shadow 0.18s, transform 0.18s;
-  box-shadow: 0 2px 12px var(--brown2);
+  box-shadow: 0 2px 3px var(--brown1);
   letter-spacing: 0.02em;
   width: 100%;
   display: block;
@@ -425,7 +429,7 @@ section h2 {
 .rate-comment-form button[type="submit"]:hover,
 .rate-comment-form button[type="submit"]:focus {
   background: var(--brown2);
-  box-shadow: 0 4px 18px var(--brown2);
+  box-shadow: 0 4px 18px rgba(0, 177, 79, 0.18);
   transform: translateY(-2px) scale(1.03);
 }
 
@@ -717,222 +721,69 @@ section h2 {
 .mt-2 { margin-top: 2rem; }
 .mb-2 { margin-bottom: 2rem; }
 
-
-/* Profile Modal & Forms */
-.close {
-  position: absolute;
-  right: 1.2rem;
-  top: 1.2rem;
-  font-size: 1.5rem;
-  color: #888;
-  cursor: pointer;
-  transition: color var(--transition);
-}
-.close:hover {
-  color: var(--primary-dark);
+/* Sign In / Sign Up Modal Styles */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 999;
 }
 
-/* For EDIT FORM PROFILE */
+.card-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: linear-gradient(to bottom right, rgba(255,255,255,0.9), rgba(187, 114, 4, 0.7));
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 20px;
+  display: none;
+  z-index: 1000;
+  color: black;
+}
 
-.profile-form {
+.card-container h2 {
+  margin-top: 0;
+}
+
+.card-container form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  background: rgba(255,255,255,0.97);
-  border-radius: 12px;
-  box-shadow: 0 2px 16px rgba(0, 177, 79, 0.10);
-  padding: 1.3rem 1.5rem;
-  width: 100%;
-  max-width: 350px;
-  margin: 0 auto;
-  position: relative;
 }
 
-.profile-pic-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.2rem;
+.card-container label {
+  margin: 10px 0 5px;
 }
 
-.profile-pic-upload-wrapper {
-  position: relative;
-  display: inline-block;
+.card-container input[type="text"],
+.card-container input[type="password"],
+.card-container input[type="email"],
+.card-container input[type="date"],
+.card-container select {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-.profile-pic-large {
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--primary, #00b14f);
-  background: var(--gray, #f3f4f6);
-  transition: border-color 0.18s;
-}
-
-.profile-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.profile-fields label {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.97rem;
-  color: #222;
-  margin-bottom: 0.1rem;
-  font-weight: 500;
-}
-
-.profile-fields input[type="text"],
-.profile-fields input[type="email"],
-.profile-fields input[type="date"],
-.profile-fields select {
-  padding: 0.32rem 0.6rem;
-  border-radius: 5px;
-  border: 1px solid var(--gray, #e5e7eb);
-  font-size: 0.97rem;
-  margin-top: 0.13rem;
-  background: #f9fafb;
-  transition: border-color 0.18s, box-shadow 0.18s;
-}
-
-.profile-fields input:focus,
-.profile-fields select:focus {
-  border-color: var(--primary, #00b14f);
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(0,177,79,0.08);
-}
-
-.save-btn {
-  background: var(--primary, #00b14f);
-  color: var(--white, #fff);
+.card-container button.submit-btn {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #333;
+  color: white;
   border: none;
-  border-radius: 7px;
-  padding: 0.45rem 1.1rem;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background 0.18s, box-shadow 0.18s;
-  margin-top: 0.5rem;
-  box-shadow: 0 1px 4px rgba(0,177,79,0.06);
 }
 
-.save-btn:hover,
-.save-btn:focus {
-  background: var(--primary-dark, #008f3a);
-  box-shadow: 0 2px 8px rgba(0,177,79,0.13);
-}
-
-/* For uploading profile picture */
-
-.profile-pic-upload-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.profile-pic-upload-wrapper .profile-pic-large {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--primary);
-  background: var(--gray);
-}
-
-.camera-icon-label {
-  position: absolute;
-  bottom: -10px;
-  right: -10px;
-  background: #fff;
-  border-radius: 50%;
-  padding: 0.22em 0.28em;
-  box-shadow: 0 1px 4px rgba(0,177,79,0.08);
-  cursor: pointer;
-  border: 2px solid #e5e7eb;
-  color: #00b14f;
-  font-size: 1.15em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-  transition: border-color 0.18s, color 0.18s, background 0.18s;
-}
-
-.camera-icon-label:hover {
-  background: #e6f9ed;
-  color: #008f3a;
-  border-color: #00b14f;
-}
-
-.cafe-card {
-  border: none;
-  box-shadow: 0 4px 24px rgba(0, 177, 79, 0.13), 0 1.5px 0 0 #e5e7eb;
-  background: rgba(46, 45, 45, 0.6);
-  transition: box-shadow 0.22s, transform 0.22s;
-  border-radius: 18px;
-}
-.cafe-card:hover {
-  box-shadow: 0 8px 32px rgba(73, 54, 40, 0.18), 0 2px 0 0 #493628;
-  transform: translateY(-6px) scale(1.025);
-}
-
-.cafe-img {
-  border-radius: 18px 18px 0 0;
-  box-shadow: 0 2px 8px rgba(0, 177, 79, 0.07);
-}
-
-.cafe-info {
-  gap: 1.1rem;
-  font-size: 1.08rem;
-  letter-spacing: 0.01em;
-}
-
-.cafe-info h3 {
-  font-size: 1.4rem;
-  letter-spacing: 0.02em;
-  margin-bottom: 0.2rem;
-}
-
-.cafe-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5em;
-  margin-bottom: 0.1em;
-}
-
-.cafe-card-header h3 {
-  font-size: 1.08rem;
-  font-weight: 700;
-  margin: 0;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1 1 auto;
-}
-
-.cafe-options-btn {
-  background: none;
-  border: none;
-  color: #888;
-  font-size: 1.3em;
-  cursor: pointer;
-  padding: 0.1em 0.4em;
-  border-radius: 50%;
-  transition: background 0.15s, color 0.15s;
-  margin-left: 0.5em;
-  align-self: flex-start;
-  line-height: 1;
-  height: 2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.cafe-options-btn:hover,
-.cafe-options-btn:focus {
-  color: var(--primary-dark);
+.card-container button.submit-btn:hover {
+  background-color: #555;
 }
