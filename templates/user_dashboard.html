@@ -154,21 +154,6 @@
                                 <em>No comments yet.</em>
                             {% endif %}
                         </div>
-                        <!-- Combined Rate and Comment Form -->
-                        <form method="POST" action="{{ url_for('rate_and_comment_cafe', cafe_id=cafe._id) }}" class="rate-comment-form">
-                            <label>
-                            Rate:
-                            <span class="star-rating">
-                            <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars"></label>
-                            <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars"></label>
-                            <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars"></label>
-                            <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars"></label>
-                            <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star"></label>
-                            </span>
-                        </label>
-                        <input type="text" name="comment" placeholder="Leave a comment..." required />
-                        <button type="submit">Submit</button>
-                        </form>
                     </div>
                 </div>
                 {% endfor %}
@@ -196,6 +181,21 @@
                         <strong>All Comments:</strong>
                         <ul id="modalCafeComments"></ul>
                     </div>
+                    <!-- Combined Rate and Comment Form -->
+                        <form id="modalRateCommentForm" method="POST" action="#" class="rate-comment-form">
+                            <label>
+                            Rate:
+                            <span class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars"></label>
+                            <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars"></label>
+                            <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars"></label>
+                            <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars"></label>
+                            <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star"></label>
+                            </span>
+                        </label>
+                        <input type="text" name="comment" placeholder="Leave a comment..." required />
+                        <button type="submit">Submit</button>
+                        </form>
                 </div>
             </div>
         </div>
@@ -266,7 +266,6 @@
 </div>
 
     <script>
-        // Wrap all JS code in an IIFE to avoid redeclaration errors
         (function() {
             const currentUsername = "{{ user.username|e }}";
 
@@ -282,7 +281,6 @@
             const searchInput = document.getElementById('navbar-search-input');
             const cafeCards = document.querySelectorAll('.cafe-card');
 
-            // Show/hide search bar
             searchToggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 if (searchForm.style.display === 'flex') {
@@ -317,8 +315,6 @@
                 }
             });
 
-
-
             const cafes = {{ cafes|tojson|safe }};
             function openCafeModal(idx) {
                 const cafe = cafes[idx];
@@ -334,6 +330,8 @@
 
                 document.getElementById('modalCafeName').textContent = cafe.name;
                 document.getElementById('modalCafeDesc').textContent = cafe.description;
+
+                document.getElementById('modalRateCommentForm').action = `/cafe/rate_and_comment/${cafe._id}`;
                 // Rating
                 let ratingHtml = '';
                 let ratings = cafe.ratings || [];
@@ -390,6 +388,8 @@
                 document.getElementById('cafeModal').style.display = 'block';
                 document.body.style.overflow = 'hidden';
             }
+
+
             function openProfileModal() {
                 document.getElementById('profileModal').style.display = 'block';
                 document.body.style.overflow = 'hidden';

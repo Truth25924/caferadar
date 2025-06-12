@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
+<div class="text">
 <h1>Manage Recommendations</h1>
+</div>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
@@ -33,3 +35,5 @@
   <button type="submit" class="save-btn">Save Changes</button>
 </form>
 {% endblock %}
+
+

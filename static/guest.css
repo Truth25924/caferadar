@@ -195,7 +195,7 @@ section h2 {
 .cafe-card {
   background: rgba(56, 55, 55, 0.4);
   border: none;
-  box-shadow: 0 4px 24px rgba(0, 177, 79, 0.13), 0 1.5px 0 0 #e5e7eb;
+  box-shadow: 0 4px 24px var(--brown2), 0 1.5px 0 0 #e5e7eb;
   width: 340px;
   display: flex;
   flex-direction: column;
@@ -414,6 +414,7 @@ section h2 {
   display: flex;
   align-items: center;
   gap: 0.5em;
+  color: black;
 }
 
 .star-rating {
@@ -579,18 +580,20 @@ section h2 {
 .cafe-modal-details .cafe-comments {
   border-radius: 10px;
   padding: 1.1em 1.3em;
-  top: 25rem;
-  left: 2.5rem;
-  position: absolute;
-  min-height: 12em;
-  max-height: 45%;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   width: 88%;
   color: black;
+  background: transparent;
+  position: relative;
+  min-height: unset;
+  max-height: unset;
+  height: unset;
+  top: unset;
+  left: unset;
 }
+
 .cafe-modal-details .cafe-comments > strong {
   margin-bottom: 0.7em;
   font-size: 1.08em;

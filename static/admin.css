@@ -447,15 +447,15 @@ body {
 }
 
 .cafe-actions .btn-danger {
-  background: var(--danger);
-  color: var(--white);
+  background: #b91c1c;
+  color: white;
   border: none;
   padding: 0.4rem 0.7rem;
   border-radius: 5px;
   cursor: pointer;
   font-size: 1rem;
   transition: background 0.18s;
-  box-shadow: 0 1px 4px rgba(239, 68, 68, 0.07);
+  box-shadow: 0 1px 4px rgba(239, 68, 68, 0.1);
 }
 
 .cafe-actions .btn-danger:hover {
@@ -463,7 +463,7 @@ body {
 }
 
 .cafe-actions .btn-approve {
-  background: var(--primary);
+  background: rgb(43, 43, 231);
   color: var(--white);
   border: none;
   padding: 0.4rem 0.7rem;
@@ -633,20 +633,17 @@ footer {
 .cafe-modal-details .cafe-rating {
   margin: 0.5rem 0 0.2rem 0;
 }
+
 .cafe-modal-details .cafe-comments {
   border-radius: 10px;
   padding: 1.1em 1.3em;
-  top: 30rem;
-  left: 2.5rem;
-  position: absolute;
-  min-height: 12em;
-  max-height: 35%;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   width: 88%;
+  color: black;
 }
+
 .cafe-modal-details .cafe-comments > strong {
   margin-bottom: 0.7em;
   font-size: 1.08em;
@@ -1059,8 +1056,9 @@ footer {
   }
 }
 
-.h1 {
+.text h1 {
   color: var(--brown2);
+  margin-bottom: 2rem;
 }
 
 .admin-cafe-list-flex {

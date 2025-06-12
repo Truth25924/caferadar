@@ -11,8 +11,9 @@
     </div>
   {% endif %}
 {% endwith %}
-
-<h2>Manage Users</h2>
+<div class="text">
+<h1>Manage Users</h1>
+</div>
 <div class="user-list">
   {% for user in users %}
   <div class="user-item" data-user='{{ user | tojson | safe }}'>
