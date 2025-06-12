@@ -315,7 +315,7 @@ section h2 {
   font-size: 0.98rem;
 }
 
-/* Cafe Card Comment Preview */
+
 .cafe-comments {
   margin-top: 0.5rem;
   font-size: 0.98rem;
@@ -394,7 +394,7 @@ section h2 {
   max-width: 100%;
 }
 
-/* Rate & Comment Form */
+
 .rate-comment-form {
   display: flex;
   flex-direction: column;
@@ -447,7 +447,7 @@ section h2 {
   content: "\f005";
   position: absolute;
   left: 0;
-  color: #fff; /* outlined, not filled */
+  color: #fff; 
   opacity: 1;
   width: 100%;
   overflow: hidden;
@@ -456,7 +456,7 @@ section h2 {
   overflow: visible;
 }
 
-/* Fill stars on hover or checked */
+
 .star-rating input[type="radio"]:checked ~ label:before,
 .star-rating label:hover ~ label:before,
 .star-rating label:hover:before {
@@ -505,7 +505,7 @@ section h2 {
   transform: translateY(-2px) scale(1.03);
 }
 
-/* Modal Styles */
+
 .cafe-modal {
   display: none;
   position: fixed;
@@ -576,7 +576,7 @@ section h2 {
   margin: 0.5rem 0 0.2rem 0;
 }
 
-/* Modal Comments Section */
+
 .cafe-modal-details .cafe-comments {
   border-radius: 10px;
   padding: 1.1em 1.3em;
@@ -680,7 +680,7 @@ section h2 {
   width: 100%;
 }
 
-/* Modal Address */
+
 .cafe-modal-address {
   margin-top: 0.7em;
   color: #222;
@@ -742,7 +742,7 @@ section h2 {
   box-shadow: 0 2px 12px rgba(0, 177, 79, 0.18);
 }
 
-/* DELETE STYLES */
+
 
 .delete-comment-btn {
     background: none;
@@ -760,7 +760,7 @@ section h2 {
     background: #ffeaea;
 }
 
-/* FLASHES */
+
 .flashes {
   margin: 1.2em auto 0 auto;
   max-width: 600px;
@@ -791,12 +791,12 @@ section h2 {
   border-color: #2563eb;
 }
 
-/* Utility classes */
+
 .text-center { text-align: center; }
 .mt-2 { margin-top: 2rem; }
 .mb-2 { margin-bottom: 2rem; }
 
-/* Sign In / Sign Up Modal Styles */
+
 .overlay {
   position: fixed;
   top: 0;

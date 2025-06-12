@@ -46,7 +46,7 @@
   </div>
 </div>
 
-<!-- Add Cafe Form with Image Upload -->
+
 <div class="add-cafe-form">
   <h3>Add New Cafe</h3>
   <form
@@ -81,7 +81,7 @@
   </form>
 </div>
 
-<!-- Cafe List as Flex Cards -->
+
 <div class="cafe-list-flex">
   {% for cafe in cafes %}
   <div
@@ -156,8 +156,6 @@
   {% endfor %}
 </div>
 
-<!-- Cafe Details Modal -->
-<!-- Synchronized Admin Modal (matches user_dashboard.html) -->
 <div id="cafeModal" class="cafe-modal">
     <div class="cafe-modal-content">
           <span class="cafe-modal-close" onclick="closeCafeModal()">&times;</span>
@@ -194,10 +192,10 @@
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        // Remove the comment from the modal instantly
+
         const li = btn.closest('li');
         if (li) li.remove();
-        // Optionally, show a flash message or notification
+  
       } else {
         alert(data.msg || "Failed to delete comment.");
       }
@@ -205,7 +203,7 @@
     .catch(() => alert("Failed to delete comment."));
   }
 
-  // Format date as "Mon DD, YYYY"
+ 
   function formatDate(isoString) {
     if (!isoString) return '';
     const date = new Date(isoString);
@@ -219,7 +217,7 @@
     cafe.image_url || "{{ url_for('static', filename='default_cafe.jpg') }}";
     document.getElementById("modalCafeImg").alt = cafe.name + " image";
 
-    // Address
+    
     let addressHtml = '';
     if (cafe.address) {
       addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>${cafe.address}</span>`;
@@ -228,8 +226,8 @@
     }
     document.getElementById('modalCafeAddress').innerHTML = addressHtml;
 
-    // Ratings
-    let ratingCounts = [0, 0, 0, 0, 0, 0]; // index 1-5
+   
+    let ratingCounts = [0, 0, 0, 0, 0, 0]; 
     let userReviewCounts = {};
     let totalRating = 0;
     let ratings = cafe.ratings || [];
@@ -240,7 +238,7 @@
     });
     let avgRating = ratings.length ? (totalRating / ratings.length) : 0;
 
-    // Stars and average
+
     let stars = "";
     for (let i = 1; i <= 5; i++) {
       stars += i <= avgRating
@@ -252,7 +250,7 @@
     </span>`;
     document.getElementById("modalCafeRating").innerHTML = stars;
 
-    // Rating breakdown
+   
     let breakdownHtml = `<div style="margin:0.5rem 0 1rem 0;"><strong>Rating Breakdown:</strong><br>`;
     for (let i = 5; i >= 1; i--) {
       breakdownHtml += `
@@ -267,12 +265,12 @@
     breakdownHtml += `</div>`;
     document.getElementById("modalCafeRatingBreakdown").innerHTML = breakdownHtml;
 
-    // Comments (synchronized with user modal)
+  
     let comments = cafe.comments || [];
     let commentsHtml = "";
     if (comments.length > 0) {
       comments.forEach(c => {
-        // Find user's rating for this comment (by user and timestamp)
+        
         let userRating = 0;
         if (Array.isArray(ratings)) {
           let found = ratings.find(r => r.user === c.user && r.timestamp === c.timestamp);
@@ -308,10 +306,10 @@
     } else {
       commentsHtml = '<li><em>No comments yet.</em></li>';
     }
-    // Use the modal-comments-list class for styling
+
     document.getElementById("modalCafeComments").innerHTML = commentsHtml;
 
-    // Set location
+   
     if (cafe.maps_url) {
       document.getElementById(
         "modalCafeLocation"
@@ -322,11 +320,11 @@
       document.getElementById("modalCafeLocation").innerHTML = "";
     }
 
-    // Set modal title and description
+ 
     document.getElementById("modalCafeName").textContent = cafe.name || "";
     document.getElementById("modalCafeDesc").textContent = cafe.description || "";
 
-    // Show modal
+   
     document.getElementById("cafeModal").classList.add("show");
     document.body.style.overflow = "hidden";
   }
@@ -336,12 +334,12 @@
     document.body.style.overflow = "";
   }
 
-  // Close modal on ESC key
+
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeCafeModal();
   });
 
-  // Close modal if click outside content
+  
   document.getElementById("cafeModal").addEventListener("click", function (e) {
     if (e.target === this) closeCafeModal();
   });

@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <!-- Navigation Bar -->
+
     <header class="navbar">
     <a href="{{ url_for('home') }}" style="text-decoration: none; display: flex; align-items: center;">
         <h2 style="display: flex; align-items: center; gap: 0.3rem; margin: 0;">
@@ -38,7 +38,7 @@
         </a>
     </div>
     </header>
-    <!-- Flash Messages -->
+   
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <div class="flashes">
@@ -50,10 +50,10 @@
     {% endwith %}
 
 
-    <!-- Main Content -->
+  
     <div class="dashboard-container">
         
-    <!--$$$ Recommendation Section $$$-->
+
 
         <section id="recommended">
             <h2>Recommended Cafes</h2>
@@ -97,7 +97,7 @@
         </section>
     </div>
 
-    <!--$$$ All Cafes Section $$$-->
+
     <section id="cafes">
             <h2>All Cafes</h2>
             <div class="cafe-list">
@@ -132,7 +132,7 @@
                             </span>
                         </div>
 
-                        <!-- Latest Comment Preview -->
+                      
                         <div class="cafe-comments cafe-comments-previews">
                             {% if cafe.comments and cafe.comments|length > 0 %}
                                 {% set latest = cafe.comments[-1] %}
@@ -160,7 +160,7 @@
             </div>
         </section>
 
-    <!-- Profile Modal -->
+    
     <div id="cafeModal" class="cafe-modal">
         <div class="cafe-modal-content">
             <span class="cafe-modal-close" onclick="closeCafeModal()">&times;</span>
@@ -181,7 +181,7 @@
                         <strong>All Comments:</strong>
                         <ul id="modalCafeComments"></ul>
                     </div>
-                    <!-- Combined Rate and Comment Form -->
+                    
                         <form id="modalRateCommentForm" method="POST" action="#" class="rate-comment-form">
                             <label>
                             Rate:
@@ -207,20 +207,19 @@
       <img src="{{ user.profile_pic_url if user.profile_pic_url else url_for('static', filename='default_profile.png') }}" alt="Profile Picture" class="profile-pic-large">
       <h2 style="margin:0.5em 0 0.2em 0;">{{ user.username|capitalize }}</h2>
       <p style="color:#555; margin-bottom:0.5em;">Email: {{ user.email }}</p>
-      <!-- Add more user info here if desired -->
+
       <button class="save-btn" type="button" onclick="openEditProfileModal()">Edit Profile</button>
     </div>
   </div>
 </div>
 
-    <!-- Profile Edit Modal (Form) -->
+
 
 <div id="editProfileModal" style="display:none; position:fixed; z-index:1003; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5);">
     <form class="profile-form" method="POST" action="{{ url_for('edit_profile') }}" enctype="multipart/form-data" style="position:relative; max-width:400px; margin:5vh auto; top:5vh;">
         <span class="close edit-profile-modal-close" onclick="closeEditProfileModal(event)" style="position:absolute; top:0.8rem; right: 0.8rem; font-size:1.5rem; color:#888; cursor:pointer;">&times;</span>
         <div class="profile-pic-section" style="position:relative; display:flex; flex-direction:column; align-items:center;">
 
-        <!-- Profile Picture with Camera Icon Overlay -->
 
         <div class="profile-pic-upload-wrapper">
             <img id="editProfilePicPreview" src="{{ user.profile_pic_url if user.profile_pic_url else url_for('static', filename='default_profile.png') }}" alt="Profile Picture" class="profile-pic-large">
@@ -293,7 +292,7 @@
                 }
             });
 
-            // Filter cafes as you type
+
             searchInput.addEventListener('input', function() {
                 const query = searchInput.value.trim().toLowerCase();
                 cafeCards.forEach(card => {
@@ -306,7 +305,7 @@
                 });
             });
 
-            // Hide search bar on Escape
+
             searchInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     searchForm.style.display = 'none';
@@ -319,7 +318,7 @@
             function openCafeModal(idx) {
                 const cafe = cafes[idx];
                 document.getElementById('modalCafeImg').src = cafe.image_url || "{{ url_for('static', filename='default_cafe.jpg') }}";
-                // Address (NEW)
+
                 let addressHtml = '';
                 if (cafe.address) {
                     addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>${cafe.address}</span>`;
@@ -332,7 +331,7 @@
                 document.getElementById('modalCafeDesc').textContent = cafe.description;
 
                 document.getElementById('modalRateCommentForm').action = `/cafe/rate_and_comment/${cafe._id}`;
-                // Rating
+
                 let ratingHtml = '';
                 let ratings = cafe.ratings || [];
                 let ratingSum = ratings.reduce((a, b) => a + (b.rating || 0), 0);
@@ -345,9 +344,9 @@
                 }
                 ratingHtml += `<span class="rating-number">${avgRating.toFixed(1)} / 5 (${ratingCount})</span>`;
                 document.getElementById('modalCafeRating').innerHTML = ratingHtml;
-                // Location
+            
                 document.getElementById('modalCafeLocation').innerHTML = `<a href="${cafe.maps_url}" target="_blank" class="cafe-location"><i class="fa-solid fa-location-dot"></i> View on Maps</a>`;
-                // Comments
+       
                 let commentsHtml = '';
                 if (cafe.comments && cafe.comments.length > 0) {
                     cafe.comments.forEach(c => {
@@ -413,7 +412,7 @@
                 document.getElementById('editProfileModal').style.display = 'none';
                 document.body.style.overflow = '';
             }
-            // Preview profile picture before upload
+
             function previewProfilePic(event) {
                 const [file] = event.target.files;
                 if (file) {
@@ -438,13 +437,13 @@
                 }
             }
 
-            // Sign In / Sign Up modal toggle scripts
+       
             const signInBtn = document.getElementById('sign-in-btn');
             const signUpBtn = document.getElementById('sign-up-btn');
             const signInCard = document.getElementById('sign-in-card');
             const signUpCard = document.getElementById('sign-up-card');
 
-            // Create overlay div
+   
             const overlay = document.createElement('div');
             overlay.className = 'overlay';
             document.body.appendChild(overlay);
@@ -478,24 +477,24 @@
                 }
             });
 
-            // Hide cards when clicking on overlay
+         
             overlay.addEventListener('click', () => {
                 hideCards();
             });
 
-            // Show sign-in card and overlay if error exists
+     
             if (document.body.dataset.loginError === "true") {
                 window.addEventLitener('DOMContentLoaded', (event) => {
                     showCard(signIsnCard);
                 });
             }
 
-            // Show sign-up card and overlay if success exists
+       
             if (document.body.dataset.registerSuccess === "true") {
                 showCard(signUpCard);
             }
 
-            // Toggle between sign-in and sign-up cards
+      
             document.getElementById('show-sign-up').addEventListener('click', () => {
                 hideCards();
                 showCard(signUpCard);
@@ -506,7 +505,7 @@
                 showCard(signInCard);
             });
 
-            // Auto-hide flash messages inside cards after 3 seconds
+      
             document.addEventListener('DOMContentLoaded', () => {
                 const flashContainers = document.querySelectorAll('.card-container .flashes');
                 flashContainers.forEach(flashContainer => {

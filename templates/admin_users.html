@@ -36,13 +36,13 @@
   {% endfor %}
 </div>
 
-<!-- User Details Modal -->
+
 <div id="userDetailsModal" class="modal" style="display:none;">
   <div class="modal-content" style="max-width: 400px;">
     <span class="close" onclick="closeUserDetails()">&times;</span>
     <h3>User Details</h3>
     <div id="userDetailsBody">
-      <!-- Details will be loaded here -->
+ 
     </div>
   </div>
 </div>
@@ -50,7 +50,7 @@
 <script>
 function showUserDetails(btn) {
   const user = JSON.parse(btn.closest('.user-item').getAttribute('data-user'));
-  // Optionally, fetch more details via AJAX if needed
+
   let html = `
     <strong>Username:</strong> ${user.username}<br>
     <strong>Role:</strong> ${user.role}<br>
@@ -75,7 +75,7 @@ window.onclick = function(event) {
   }
 }
 
-// Auto-hide flash messages inside cards after 3 seconds
+
 document.addEventListener('DOMContentLoaded', () => {
     const flashContainers = document.querySelectorAll('.card-container .flashes');
     flashContainers.forEach(flashContainer => {

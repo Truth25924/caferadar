@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
     <body>
-        <!-- Navigation Bar -->
+        
         <header class="navbar">
             <a href="{{ url_for('home') }}" style="text-decoration: none;">
                 <h2 style="display: flex; align-items: center; gap: 0.3rem; margin: 0;">
@@ -101,7 +101,7 @@
         </p>
     </div>
 
-    <!-- Flash Messages -->
+   
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     <div class="flashes">
@@ -112,9 +112,9 @@
     {% endif %}
     {% endwith %}
 
-    <!-- Main Content -->
+ 
     <div class="dashboard-container">
-        <!--$$$ Recommendation Section $$$-->
+
         <section id="recommended">
             <h2>Recommended Cafes</h2>
             <div class="cafe-list">
@@ -155,7 +155,7 @@
         </section>
     </div>
 
-    <!-- ALL CAFES -->
+  
         <section id="cafes">
             <h2>All Cafes</h2>
             <div class="cafe-list">
@@ -188,7 +188,7 @@
                             <span class="rating-number">{{ "%.1f"|format(rating) }} / 5 ({{ rating_count }})</span>
                         </div>
 
-                        <!-- Latest Comment Preview -->
+                       
                         <div class="cafe-comments cafe-comments-previews">
                             {% if cafe.comments and cafe.comments|length > 0 %}
                             {% set latest = cafe.comments[-1] %}
@@ -216,7 +216,7 @@
             </div>
         </section>
 
-    <!-- Cafe Modal -->
+   
     <div id="cafeModal" class="cafe-modal" style="display:none;">
         <div class="cafe-modal-content">
             <span class="cafe-modal-close" onclick="closeCafeModal()">&times;</span>
@@ -237,7 +237,7 @@
                         <strong>All Comments:</strong>
                         <ul id="modalCafeComments"></ul>
                     </div>
-                    <!-- Combined Rate and Comment Form -->
+                    
                     <form id="modalRateCommentForm" method="POST" action="#" class="rate-comment-form">
                             <label>
                             Rate:
@@ -262,11 +262,11 @@
     console.log("cafes variable:", cafes);
 
     (function () {
-    // Handle rate and comment form submission for guests
+   
     function handleRateCommentSubmit(event) {
         var user = {{ 'true' if session.get('username') else 'false' }};
         if (!user) {
-            event.preventDefault(); // Stop form submission
+            event.preventDefault();
 
             const signInCard = document.getElementById('sign-in-card');
             const overlay = document.querySelector('.overlay');
@@ -287,7 +287,7 @@
     function openCafeModal(idx) {
     const cafe = cafes[idx];
     document.getElementById('modalCafeImg').src = cafe.image_url || "{{ url_for('static', filename='default_cafe.jpg') }}";
-    // Address
+    
     let addressHtml = '';
     if (cafe.address) {
         addressHtml = `<i class="fa-solid fa-location-dot"></i> <span>${cafe.address}</span>`;
@@ -302,7 +302,7 @@
     document.getElementById('modalRateCommentForm').action = `/rate_and_comment_cafe/${cafe._id}`;
     
 
-    // Rating
+   
     let ratingHtml = '';
     let ratings = cafe.ratings || [];
     let ratingSum = ratings.reduce((a, b) => a + (b.rating || 0), 0);
@@ -316,12 +316,12 @@
     ratingHtml += `<span class="rating-number">${avgRating.toFixed(1)} / 5 (${ratingCount})</span>`;
     document.getElementById('modalCafeRating').innerHTML = ratingHtml;
 
-    // Location
+  
     document.getElementById('modalCafeLocation').innerHTML = cafe.maps_url
         ? `<a href="${cafe.maps_url}" target="_blank" class="cafe-location"><i class="fa-solid fa-location-dot"></i> View on Maps</a>`
         : '';
 
-    // Comments (view only)
+   
     let commentsHtml = '';
     if (cafe.comments && cafe.comments.length > 0) {
         cafe.comments.forEach(c => {
@@ -364,7 +364,7 @@
         const searchInput = document.getElementById('navbar-search-input');
         const cafeCards = document.querySelectorAll('.cafe-card');
 
-        // Show/hide search bar
+     
         searchToggle.addEventListener('click', function(e) {
         e.preventDefault();
         if (searchForm.style.display === 'flex') {
@@ -377,7 +377,7 @@
         }
     });
 
-    // Filter cafes as you type
+   
         searchInput.addEventListener('input', function() {
             const query = searchInput.value.trim().toLowerCase();
             cafeCards.forEach(card => {
@@ -390,7 +390,7 @@
         });
     });
 
-    // Hide search bar on Escape
+  
     searchInput.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             searchForm.style.display = 'none';
@@ -402,7 +402,7 @@
 
 
         document.addEventListener('DOMContentLoaded', () => {
-        // Attach submit handler to all rate-comment forms
+     
         const rateForms = document.querySelectorAll('.rate-comment-form');
         rateForms.forEach(form => {
             form.addEventListener('submit', handleRateCommentSubmit);
@@ -416,13 +416,13 @@
             }
 
     
-        // Sign In / Sign Up modal toggle scripts
+     
         const signInBtn = document.getElementById('sign-in-btn');
         const signUpBtn = document.getElementById('sign-up-btn');
         const signInCard = document.getElementById('sign-in-card');
         const signUpCard = document.getElementById('sign-up-card');
         
-        // Create overlay div
+   
         let overlay = document.querySelector('.overlay');
         if (!overlay) {
             overlay = document.createElement('div');
@@ -459,22 +459,22 @@
             }
         });
 
-        // Hide cards when clicking on overlay
+     
         overlay.addEventListener('click', () => {
             hideCards();
         });
 
-        // Show sign-in card if login error
+       
         if (document.body.dataset.loginError === "true") {
             showCard(signInCard);
         }
 
-        // Show sign-up card if register success
+       
         if (document.body.dataset.registerSuccess === "true") {
             showCard(signUpCard);
         }
 
-        // Toggle between sign-in and sign-up cards
+       
         document.getElementById('show-sign-up').addEventListener('click', () => {
             hideCards();
             showCard(signUpCard);
@@ -485,7 +485,7 @@
             showCard(signInCard);
         });
 
-        // Auto-hide flash messages inside cards after 3 seconds
+      
         const flashContainers = document.querySelectorAll('.flashes');
         flashContainers.forEach(flashContainer => {
             setTimeout(() => {

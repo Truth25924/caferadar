@@ -24,7 +24,7 @@
   <body>
     <div class="container">
       {% if session.get('username') %}
-      <!-- Existing sidebar navigation -->
+     
       <nav class="navigation">
         <div class="logo">CafeRadar</div>
         <ul>
@@ -34,14 +34,6 @@
               <span class="title">Dashboard</span>
             </a>
           </li>
-          <!--<li
-            class="{% if request.endpoint in ['add_cafe', 'edit_cafe', 'delete_cafe'] %}active{% endif %}"
-          >
-            <a href="{{ url_for('dashboard') }}#cafes">
-              <span class="icon"><i class="fa-solid fa-mug-hot"></i></span>
-              <span class="title">Cafes</span>
-            </a>
-          </li>-->
           <li
             class="{% if request.endpoint == 'admin_users' %}active{% endif %}"
           >
@@ -84,13 +76,12 @@
  
 
     <script>
-      // Sidebar toggle for responsiveness
       function toggleNav() {
         document.querySelector(".navigation").classList.toggle("minimized");
         document.querySelector(".main").classList.toggle("nav-minimized");
       }
 
-      // Toggle menu dropdown
+  
       document.addEventListener('DOMContentLoaded', function() {
         const menuToggleBtn = document.getElementById('menu-toggle-btn');
         const menuDropdown = document.getElementById('menu-dropdown');
@@ -106,7 +97,7 @@
     </script>
 
     <style>
-      /* Styles for the new top navbar */
+  
       .top-navbar {
         display: flex;
         justify-content: space-between;

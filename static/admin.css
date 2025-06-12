@@ -1,6 +1,4 @@
-/* CafeRadar Admin Panel - Sidebar Layout & Dashboard Cards */
 
-/* Root variables */
 :root {
   --brown1: #d6c0b3;
   --brown2: #ab886d;
@@ -16,7 +14,6 @@
 }
 
 
-/* Reset and base styles */
 * {
   font-family: var(--font-family);
   margin: 0;
@@ -37,7 +34,7 @@ body {
   padding: 0;
 }
 
-/* Sidebar Navigation */
+
 .navigation {
   position: fixed !important;
   width: 260px;
@@ -64,7 +61,7 @@ body {
   letter-spacing: 2px;
   padding: 2rem 1.5rem 1.5rem 2rem;
   text-align: left;
-  display: block; /* Always show logo */
+  display: block; 
 }
 
 .navigation ul {
@@ -107,7 +104,6 @@ body {
   font-size: 1.4rem;
 }
 
-/* Hide the text label when minimized, show only icons */
 .navigation.minimized ul li a .title {
   display: none;
 }
@@ -121,7 +117,7 @@ body {
   width: 100%;
 }
 
-/* Responsive: On mobile, keep logo, hide burger, sidebar stays minimized */
+
 @media (max-width: 900px) {
   .navigation {
     width: 75px !important;
@@ -135,13 +131,13 @@ body {
     display: none;
   }
 
-  /* Hide the burger icon on mobile */
+ 
   .top-bar .toggle {
     display: none !important;
   }
 }
 
-/* Main Content */
+
 .main {
   margin-left: 260px;
   padding: 2.5rem 2.5rem 0 2.5rem;
@@ -166,7 +162,7 @@ body {
   }
 }
 
-/* Top Bar */
+
 .top-bar {
   width: 100%;
   display: flex;
@@ -180,17 +176,7 @@ body {
   cursor: pointer;
 }
 
-/*.top-bar .admin-name {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: var(--primary-dark);
-  background: var(--white);
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  box-shadow: var(--shadow);
-}*/
 
-/* Dashboard Cards */
 .cardBox {
   width: 100%;
   display: grid;
@@ -323,7 +309,7 @@ body {
   background: var(--primary-dark);
 }
 
-/* Responsive Table */
+
 @media (max-width: 900px) {
   .synchronized-table,
   .synchronized-table th,
@@ -344,7 +330,6 @@ body {
   }
 }
 
-/* --- Cafe List Flex Cards --- */
 .cafe-list-flex {
   display: flex;
   flex-wrap: wrap;
@@ -478,7 +463,7 @@ body {
   background: var(--primary-dark);
 }
 
-/* Responsive adjustments for cafe cards */
+
 @media (max-width: 1200px) {
   .cafe-list-flex {
     gap: 1rem;
@@ -502,9 +487,9 @@ body {
   }
 }
 
-/* Footer */
+
 footer {
-  background: #383737; /* Remove transparency */
+  background: #383737;
   color: var(--white);
   text-align: center;
   padding: 1rem 0;
@@ -515,8 +500,7 @@ footer {
   width: 100%;
 }
 
-/* ----- MODAL STYLES FOR WHEN CLICKING THE CAFE TO ENLARGE DETAILS DO NOT CHANGE ----- */
-/* --- Cafe Modal (Synchronized with User Dashboard) --- */
+
 .cafe-modal {
   display: none;
   position: fixed;
@@ -781,8 +765,6 @@ footer {
   }
 }
 
-/* DELETE BUTTON FOR ADMIN */
-
 .admin-delete-comment-btn {
   background: none;
   border: none;
@@ -800,7 +782,7 @@ footer {
   background: #ffeaea;
 }
 
-/* FOR EDIT TAB DO NOT CHANGE ADMIN ONLY */
+
 .edit-cafe-form {
   background: var(--white);
   border-radius: var(--border-radius);
@@ -910,7 +892,6 @@ footer {
   }
 }
 
-/* FLASHES MESSAGES DESIGN STYLES */
 
 .flashes {
   margin: 1.2em auto 0 auto;
@@ -942,7 +923,6 @@ footer {
   border-color: var(--brown1);
 }
 
-/* --- User List Styles for Admin Panel --- */
 .user-list {
   display: flex;
   flex-direction: column;
